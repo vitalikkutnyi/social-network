@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'src.apps.users',
+    'src.apps.posts',
 ]
 
 MIDDLEWARE = [
@@ -76,7 +79,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'socialnetwork_db',
+        'NAME': 'social_network',
         'USER': 'vtlkktn',
         'PASSWORD': 'root',
         'HOST': 'localhost',
@@ -125,3 +128,8 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'users.CustomUser'
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
