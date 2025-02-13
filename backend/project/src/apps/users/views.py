@@ -5,10 +5,13 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 import json
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, status
 from rest_framework.permissions import IsAuthenticated
-from .models import CustomUser
-from .serializers import UserProfileSerializer
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .models import CustomUser, Subscription
+from .serializers import UserProfileSerializer, SubscriptionSerializer, UserProfileShortSerializer
 from ..posts.models import Post
 from ..posts.serializers import PostSerializer
 
@@ -99,3 +102,39 @@ class UserProfileView(generics.RetrieveAPIView):
 def get_posts(self, obj):
         posts = Post.objects.filter(author=obj).order_by('-created_at')
         return PostSerializer(posts, many=True).data
+
+
+class FollowUserAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, user_id):
+        following_user = get_object_or_404(CustomUser, id=user_id)
+
+        if request.user == following_user:
+            return Response({"error": "Не можна підписатися на себе"}, status=status.HTTP_400_BAD_REQUEST)
+
+        follow, created = Subscription.objects.get_or_create(follower=request.user, following=following_user)
+
+        if not created:
+            follow.delete()
+            return Response({"message": "Відписка успішна"}, status=status.HTTP_200_OK)
+
+        return Response({"message": "Підписка успішна"}, status=status.HTTP_201_CREATED)
+
+
+class FollowersListAPIView(generics.ListAPIView):
+    serializer_class = UserProfileShortSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        user_id = self.kwargs["user_id"]
+        return CustomUser.objects.filter(following__following_id=user_id)
+
+
+class FollowingListAPIView(generics.ListAPIView):
+    serializer_class = UserProfileShortSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        user_id = self.kwargs["user_id"]
+        return CustomUser.objects.filter(followers__follower_id=user_id)
