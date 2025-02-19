@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser, Subscription
+from .models import CustomUser, Subscription, Message, Chat
 from ..posts.serializers import PostSerializer
 
 
@@ -50,7 +50,44 @@ class UserProfileShortSerializer(serializers.ModelSerializer):
         return False
 
 
+class UserProfileEditSerializer(serializers.ModelSerializer):
+    avatar = serializers.ImageField(required=False)
+    username = serializers.CharField(required=False)
+    bio = serializers.CharField(required=False, allow_blank=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'avatar', 'bio']
+
+
 class SubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
         fields = '__all__'
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    sender_name = serializers.CharField(source='sender.username', read_only=True)
+
+    class Meta:
+        model = Message
+        fields = ['sender_name', 'text', 'sent_at']
+
+
+class ChatSerializer(serializers.ModelSerializer):
+    other_user = serializers.SerializerMethodField()
+    last_message = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Chat
+        fields = '__all__'
+
+    def get_other_user(self, obj):
+        request = self.context.get('request')
+        if obj.user1 == request.user:
+            return obj.user2.username
+        return obj.user1.username
+
+    def get_last_message(self, obj):
+        last_message = obj.messages.order_by('sent_at').last()
+        return MessageSerializer(last_message).data if last_message else None

@@ -10,8 +10,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import CustomUser, Subscription
-from .serializers import UserProfileSerializer, SubscriptionSerializer, UserProfileShortSerializer
+from . import serializers
+from .models import CustomUser, Subscription, Chat, Message
+from .serializers import UserProfileSerializer, UserProfileShortSerializer, \
+    UserProfileEditSerializer, ChatSerializer, MessageSerializer
 from ..posts.models import Post
 from ..posts.serializers import PostSerializer
 
@@ -104,6 +106,22 @@ def get_posts(self, obj):
         return PostSerializer(posts, many=True).data
 
 
+class UserProfileEditAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserProfileEditSerializer(request.user)
+        return Response(serializer.data)
+
+    def put(self, request):
+        serializer = UserProfileEditSerializer(request.user, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class FollowUserAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -138,3 +156,98 @@ class FollowingListAPIView(generics.ListAPIView):
     def get_queryset(self):
         user_id = self.kwargs["user_id"]
         return CustomUser.objects.filter(followers__follower_id=user_id)
+
+
+class UserSearchAPIView(generics.ListAPIView):
+    serializer_class = UserProfileShortSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        query = self.request.query_params.get("q", "").strip()
+        if query:
+            return CustomUser.objects.filter(username__icontains=query)
+        return CustomUser.objects.none()
+
+
+class CreateChatAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user1 = request.user
+        user2_username = request.data.get('user2')
+
+        try:
+            user2 = CustomUser.objects.get(username=user2_username)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "Користувача не знайдено."}, status=status.HTTP_404_NOT_FOUND)
+
+        existing_chat = Chat.objects.filter(user1=user1, user2=user2) | Chat.objects.filter(user1=user2, user2=user1)
+
+        if existing_chat.exists():
+            return Response({"message": "Чат уже існує."}, status=status.HTTP_400_BAD_REQUEST)
+
+        chat = Chat.objects.create(user1=user1, user2=user2)
+        return Response({"message": "Чат успішно створено.", "chat_id": chat.id}, status=status.HTTP_201_CREATED)
+
+
+
+class ChatListAPIView(generics.ListAPIView):
+    serializer_class = ChatSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Chat.objects.filter(user1=user) | Chat.objects.filter(user2=user)
+
+
+class ChatDetailAPIView(generics.RetrieveAPIView):
+    serializer_class = ChatSerializer
+    permission_classes = [IsAuthenticated]
+    queryset = Chat.objects.all()
+
+
+class ChatDeleteAPIView(generics.DestroyAPIView):
+    serializer_class = ChatSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Chat.objects.filter(user1=user) | Chat.objects.filter(user2=user)
+
+
+class MessageListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = MessageSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        chat_id = self.kwargs['chat_id']
+        chat = Chat.objects.get(id=chat_id)
+
+        if self.request.user not in [chat.user1, chat.user2]:
+            raise serializers.ValidationError("Ви не маєте доступу до цього чату.")
+
+        return Message.objects.filter(chat_id=chat_id)
+
+
+    def perform_create(self, serializer):
+            chat_id = self.kwargs['chat_id']
+            chat = Chat.objects.get(id=chat_id)
+
+            if self.request.user not in [chat.user1, chat.user2]:
+                raise serializers.ValidationError("Неможливо надіслати повідомлення.")
+
+            serializer.save(chat=chat, sender=self.request.user)
+
+
+class MessageReadAPIView(generics.UpdateAPIView):
+    serializer_class = MessageSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Message.objects.all()
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.chat.user1 == request.user or instance.chat.user2 == request.user:
+            instance.is_read = True
+            instance.save()
+            return Response({"status": "read"})
+        return Response({"error": "Unauthorized"}, status=403)
