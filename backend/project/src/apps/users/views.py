@@ -22,38 +22,29 @@ from ..posts.serializers import PostSerializer
 def register_view(request):
     if request.method == 'POST':
         try:
-            data = json.loads(request.body)
-            avatar = data.get("avatar")
-            username = data.get("username")
-            bio = data.get("bio")
-            password = data.get("password")
-            password2 = data.get("password2")
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            password2 = request.POST.get('password2')
 
             if not username or not password or not password2:
-                return JsonResponse({"error": "Усі поля є обов'язковими"}, status=400)
+                return JsonResponse({"error": "Усі поля є обов'язковими!"}, status=400)
             if password != password2:
-                return JsonResponse({"error": "Паролі не співпадають"}, status=400)
+                return JsonResponse({"error": "Паролі не співпадають!"}, status=400)
             if CustomUser.objects.filter(username=username).exists():
-                return JsonResponse({"error": "Користувач уже існує"}, status=400)
+                return JsonResponse({"error": "Користувач із таким іменем уже існує!"}, status=400)
 
-            avatar_file = None
-            if avatar:
-                avatar_content = ContentFile(avatar.encode())
-                avatar_file = default_storage.save(f'avatars/{username}_avatar.jpg', avatar_content)
-
-            CustomUser.objects.create_user(username=username, password=password, bio=bio, avatar=avatar_file)
+            CustomUser.objects.create_user(username=username, password=password)
 
             user = authenticate(username=username, password=password)
             if user:
                 login(request, user)
                 return JsonResponse({"message": "Реєстрація успішна", "user_id": user.id})
-            return JsonResponse({"error": "Помилка автентифікації"}, status=500)
+            return JsonResponse({"error": "Помилка автентифікації!"}, status=500)
 
         except json.JSONDecodeError:
-            return JsonResponse({"error": "Некоректний JSON"}, status=400)
+            return JsonResponse({"error": "Некоректний JSON!"}, status=400)
 
-    return JsonResponse({"error": "Метод не дозволений"}, status=405)
-
+    return JsonResponse({"error": "Метод не дозволений!"}, status=405)
 
 
 @csrf_exempt
