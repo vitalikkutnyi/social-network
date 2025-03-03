@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import AuthForm from '../components/AuthForm';
 
 function Register() {
     const [username, setUsername] = useState('');
@@ -38,23 +39,18 @@ function Register() {
     };
     
         return (
-            <div className="register-form">
-              <h1>Реєстрація</h1>
-              <form onSubmit={handleSubmit}>
-                <div>
-                  <input type="text" id="username" value={username} onChange={(e) => setUsername(e.target.value)} required placeholder="Ім'я користувача" />
-                </div>
-                <div>
-                  <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="Пароль"/>
-                </div>
-                <div>
-                  <input type="password" id="password2" value={password2} onChange={(e) => setPassword2(e.target.value)} required placeholder="Підтвердження пароля"/>
-                </div>
-                <button type="submit">Зареєструватися</button>
-              </form>
-              {error && <div className="error">{error}</div>}
-              {!error && message && <div className="success">{message}</div>}
-            </div>
+            <AuthForm 
+            title="Реєстрація"
+            onSubmit={handleSubmit} 
+            username={username}
+            setUsername={setUsername}
+            password={password}
+            setPassword={setPassword}
+            password2={password2}
+            setPassword2={setPassword2}
+            error={error}
+            message={message}
+            buttonText="Зареєструватися"/>
           );
 } 
 
