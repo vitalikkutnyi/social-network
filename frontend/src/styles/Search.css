@@ -1,0 +1,115 @@
+.search-container {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    margin: 40px auto 20px;
+}
+  
+.search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+  
+.search-input {
+    flex: 1;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-family: "Montserrat", sans-serif;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+  
+.search-input:focus {
+    border-color: #007bff;
+}
+  
+.search-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-family: "Montserrat", sans-serif;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+  
+.search-button:hover {
+    background-color: #0056b3;
+}
+  
+.search-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+  
+.search-loading,
+.search-error,
+.search-no-results {
+    font-family: "Montserrat", sans-serif;
+    font-size: 14px;
+    margin: 5px 0;
+    text-align: center;
+}
+  
+.search-loading {
+    color: #777;
+}
+  
+.search-error {
+    color: #dc3545;
+}
+  
+.search-no-results {
+    margin: 20px;
+    color: #555;
+}
+  
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0 0;
+    max-height: 200px;
+    overflow-y: auto;
+    scrollbar-width: none;
+    z-index: 10;
+}
+  
+.search-result-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+  
+.search-result-item:hover {
+    background-color: #f4f4f9;
+}
+  
+.search-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;
+}
+  
+.search-result-item span {
+    font-family: "Montserrat", sans-serif;
+    font-size: 16px;
+    color: #333;
+}
