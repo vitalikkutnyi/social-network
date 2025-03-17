@@ -18,11 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from src.apps.users.views import CustomTokenRefreshView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('src.apps.users.urls')),
     path('', include('src.apps.posts.urls')),
+    path('token/refresh/', CustomTokenRefreshView.as_view(), name='token_refresh'),
 ]
 
 if settings.DEBUG:
