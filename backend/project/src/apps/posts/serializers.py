@@ -9,17 +9,29 @@ class LikeSerializer(serializers.ModelSerializer):
         read_only_fields = ['user', 'post']
 
 
-class CommentSerializer(serializers.ModelSerializer):
+class CommentSerializer(serializers.ModelSerializer):    
+    author = serializers.CharField(source='author.username', read_only=True)
+    avatar = serializers.SerializerMethodField()
+
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = ['id', 'text', 'created_at', 'avatar', 'author']
         read_only_fields = ['author', 'post']
+
+    def get_avatar(self, obj):
+        request = self.context.get("request")
+        if obj.author.avatar:
+            avatar_url = obj.author.avatar.url
+            return request.build_absolute_uri(avatar_url) if request else avatar_url
+        return None
 
 
 class PostSerializer(serializers.ModelSerializer):
+    is_liked_by_user = serializers.SerializerMethodField()
     likes_count = serializers.IntegerField(read_only=True)
     comments_count = serializers.IntegerField(read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
+    author = serializers.CharField(source='author.username', read_only=True)  
 
     class Meta:
         model = Post
@@ -40,3 +52,9 @@ class PostSerializer(serializers.ModelSerializer):
         if value and not value.content_type.startswith('audio'):
             raise serializers.ValidationError("Файл має бути аудіофайлом!")
         return value
+    
+    def get_is_liked_by_user(self, obj):
+        request = self.context.get("request")
+        if request and request.user.is_authenticated:
+            return Like.objects.filter(user=request.user, post=obj).exists()
+        return False
