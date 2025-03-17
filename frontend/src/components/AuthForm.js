@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-function AuthForm({ title, onSubmit, username, setUsername, password, setPassword, password2, setPassword2, error, message, buttonText }) {    
+function AuthForm({ title, onSubmit, username, setUsername, password, setPassword, password2, setPassword2, error, buttonText, anotherContent }) {    
     return (
         <div className="register-form">
             <h1>{title}</h1>
@@ -17,9 +17,9 @@ function AuthForm({ title, onSubmit, username, setUsername, password, setPasswor
                 </div>
             )}
             <button type="submit">{buttonText}</button>
+            {anotherContent}
             </form>
             {error && <div className="error">{error}</div>}
-            {!error && message && <div className="success">{message}</div>}
         </div>
     );
 } 
