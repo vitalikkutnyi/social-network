@@ -1,20 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,600;1,600&display=swap');
 
-body {
+body, #app {
   font-family: "Montserrat", sans-serif;
   background-color: #f4f4f9;
   margin: 0;
   padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   color: #333;
+  width: 100%;
 }
 
 .register-form {
-  width: 100%;
-  min-width: 350px;
+  min-width: 400px;
   max-width: 600px;
   padding: 30px;
   border-radius: 19px;
@@ -23,7 +20,12 @@ body {
   position: relative;
   color: white;
   box-sizing: border-box;
-  overflow: hidden; 
+  overflow: hidden;
+  position: fixed; 
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); 
+  margin: 0;
 }
 
 .register-form::before {
@@ -91,7 +93,10 @@ body {
   font-size: 16px;
   font-weight: 600;
   transition: background-color 0.3s ease;
-  margin-top: 20px;
+}
+
+.register-form button:last-child {
+  margin-top: 15px;
   margin-bottom: 20px;
 }
 
@@ -99,7 +104,12 @@ body {
   background-color: #6c7ae0;
 }
 
-.error, .success {
+.register-form p {
+  margin-top: 25px;
+  margin-bottom: 0;
+}
+
+.error {
   position: fixed;
   top: 20px; 
   left: 50%;
@@ -127,11 +137,6 @@ body {
 
 .error {
   background-color: rgba(255, 0, 0, 0.8);
-  color: white;
-}
-
-.success {
-  background-color: rgba(0, 255, 0, 0.8);
   color: white;
 }
 
