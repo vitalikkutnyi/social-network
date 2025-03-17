@@ -4,7 +4,7 @@ import axios from "axios";
 import { FaTrash } from "react-icons/fa";
 import Post from "../components/Post";
 
-const Comments = () => {
+const Comments = ({ onCommentAdded }) => {
     const { postId, username } = useParams();
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
@@ -13,7 +13,7 @@ const Comments = () => {
     const [currentUser, setCurrentUser] = useState(null);
     const [postOwner, setPostOwner] = useState(null);
     const [post, setPost] = useState(null);
-    const { navigate } = useNavigate();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchComments = async () => {
@@ -89,6 +89,13 @@ const Comments = () => {
             );
             setComments([response.data, ...comments]);
             setNewComment("");
+            setPost((prevPost) => ({
+                ...prevPost,
+                comments_count: prevPost.comments_count + 1,
+            }));
+            if (onCommentAdded) {
+                onCommentAdded(postId);
+            }
         } catch (err) {
             setError(err.response?.data?.detail || "Не вдалося додати коментар.");
         } finally {
@@ -118,6 +125,10 @@ const Comments = () => {
             );
 
             setComments(comments.filter((comment) => comment.id !== commentId));
+            setPost((prevPost) => ({
+                ...prevPost,
+                comments_count: prevPost.comments_count - 1,
+            }));
         } catch (err) {
             setError(err.response?.data?.detail || "Не вдалося видалити коментар.");
         } finally {
@@ -131,7 +142,7 @@ const Comments = () => {
                 <p>Завантаження...</p>
             ) : post ? (
                 <div className="comments-post-container">
-                    <Post key={post.id} post={post} username={username} disableNavigation={true} />
+                    <Post key={post.id} post={post} username={username} disableNavigation={true} hideMenu={true} />
                 </div>
             ) : (
                 <p>Допис не знайдено або видалено.</p>
@@ -158,7 +169,16 @@ const Comments = () => {
                         {comments.map((comment) => (
                             <li key={comment.id} className="comment-item">
                                 <div className="comment-item-user">
-                                    <img src={comment.avatar} alt="Avatar" />
+                                    {comment.avatar ? (
+                                        <img
+                                            src={comment.avatar}
+                                            alt="Аватар"
+                                        />
+                                    ) : (
+                                        (<img 
+                                            src={'http://127.0.0.1:8000/media/avatars/avatar.jpg'} 
+                                        />)
+                                    )}
                                     <strong>{comment.author}</strong>
                                     {postOwner === comment.author && (
                                         <>
