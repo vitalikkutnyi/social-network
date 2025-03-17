@@ -4,11 +4,12 @@ import { IoIosHeart } from "react-icons/io";
 import { FaComment, FaPenToSquare, FaTrashCan, FaEllipsisVertical } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 
-const Post = ({ post, username, onDelete, disableNavigation }) => {
+const Post = ({ post, username, onDelete, disableNavigation, hideMenu = false, onCommentAdded }) => {
     const { id, text, image, video, audio, created_at, likes_count, comments_count, is_liked_by_user } = post;
 
     const [isLiked, setIsLiked] = useState(is_liked_by_user || false); 
     const [likesCount, setLikesCount] = useState(likes_count);
+    const [commentsCount, setCommentsCount] = useState(comments_count);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [user, setUser] = useState(null); 
@@ -66,7 +67,8 @@ const Post = ({ post, username, onDelete, disableNavigation }) => {
     useEffect(() => {
         setLikesCount(likes_count); 
         setIsLiked(is_liked_by_user || false);
-    }, [id]);
+        setCommentsCount(comments_count);
+    }, [id, likes_count, is_liked_by_user, comments_count]);
 
     const handleLikeToggle = async (e) => {
         e.stopPropagation();
@@ -180,10 +182,19 @@ const Post = ({ post, username, onDelete, disableNavigation }) => {
             {user && (
                 <div className="post-container-header">
                     <div className="post-container-user">
-                        <img src={user.avatar} alt="Avatar" onError={() => console.log("Помилка завантаження аватара")} />
+                        {user.avatar_url ? (
+                            <img
+                                src={`http://127.0.0.1:8000${user.avatar_url}`}
+                                alt="Аватар"
+                            />
+                        ) : (
+                            (<img 
+                                src={'http://127.0.0.1:8000/media/avatars/avatar.jpg'} 
+                            />)
+                        )}
                         <strong>{user.username}</strong>
                     </div>
-                    {isAuthor && !isEditing && (
+                    {isAuthor && !isEditing && !hideMenu && (
                         <div className="post-menu">
                             <button className="menu-button" onClick={toggleMenu}>
                                 <FaEllipsisVertical />
@@ -244,7 +255,7 @@ const Post = ({ post, username, onDelete, disableNavigation }) => {
                     </span>
                     <span onClick={handleCommentsClick}>
                         <FaComment />
-                        {comments_count}
+                        {commentsCount}
                     </span>
                 </div>
                 <span>{formattedTime} (UTC+2) • {formattedDate}</span>
