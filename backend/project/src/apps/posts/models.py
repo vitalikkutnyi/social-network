@@ -3,6 +3,7 @@ from src.apps.users.models import CustomUser
 
 
 class Post(models.Model):
+    objects = None
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="posts")
     text = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to="post_images/", blank=True, null=True)
