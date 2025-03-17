@@ -1,6 +1,5 @@
+from datetime import timedelta
 from django.contrib.auth import authenticate, login, logout
-from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -9,6 +8,8 @@ from rest_framework import generics, permissions, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenRefreshView
 
 from . import serializers
 from .models import CustomUser, Subscription, Chat, Message
@@ -18,33 +19,53 @@ from ..posts.models import Post
 from ..posts.serializers import PostSerializer
 
 
+class CustomTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.data.get("refresh_token") 
+        if not refresh_token:
+            return Response({"error": "Refresh token не знайдено"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            refresh = RefreshToken(refresh_token)
+            access_token = str(refresh.access_token)
+            return Response({"access": access_token})
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
 @csrf_exempt
 def register_view(request):
     if request.method == 'POST':
         try:
-            username = request.POST.get('username')
-            password = request.POST.get('password')
-            password2 = request.POST.get('password2')
+            data = json.loads(request.body)
+            username = data.get('username')
+            password = data.get('password')
+            password2 = data.get('password2')
 
             if not username or not password or not password2:
-                return JsonResponse({"error": "Усі поля є обов'язковими!"}, status=400)
+                return JsonResponse({"error": "Усі поля є обов'язковими"}, status=400)
             if password != password2:
-                return JsonResponse({"error": "Паролі не співпадають!"}, status=400)
+                return JsonResponse({"error": "Паролі не співпадають"}, status=400)
             if CustomUser.objects.filter(username=username).exists():
-                return JsonResponse({"error": "Користувач із таким іменем уже існує!"}, status=400)
+                return JsonResponse({"error": "Користувач із таким іменем уже існує"}, status=400)
 
-            CustomUser.objects.create_user(username=username, password=password)
+            user = CustomUser.objects.create_user(username=username, password=password)
 
-            user = authenticate(username=username, password=password)
-            if user:
-                login(request, user)
-                return JsonResponse({"message": "Реєстрація успішна", "user_id": user.id})
-            return JsonResponse({"error": "Помилка автентифікації!"}, status=500)
+            refresh = RefreshToken.for_user(user)
+            access_token = refresh.access_token
+
+            response = JsonResponse({
+                "message": "Реєстрація успішна",
+                "access_token": str(access_token),
+                'refresh_token': str(refresh)
+            })
+
+            return response
 
         except json.JSONDecodeError:
-            return JsonResponse({"error": "Некоректний JSON!"}, status=400)
+            return JsonResponse({"error": "Некоректний JSON"}, status=400)
 
-    return JsonResponse({"error": "Метод не дозволений!"}, status=405)
+    return JsonResponse({"error": "Метод не дозволений"}, status=405)
 
 
 @csrf_exempt
@@ -52,16 +73,24 @@ def login_view(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-            username = data.get("username")
-            password = data.get("password")
+            username = data.get('username')
+            password = data.get('password')
 
             if not username or not password:
                 return JsonResponse({"error": "Заповніть усі поля"}, status=400)
 
             user = authenticate(username=username, password=password)
             if user is not None:
-                login(request, user)
-                return JsonResponse({"message": "Вхід успішний", "user": username})
+                refresh = RefreshToken.for_user(user)
+                access_token = str(refresh.access_token)
+
+                response = JsonResponse({
+                    "message": "Вхід успішний",
+                    "access_token": access_token,
+                    'refresh_token': str(refresh)
+                })
+
+                return response
             else:
                 return JsonResponse({"error": "Неправильний логін або пароль"}, status=400)
 
@@ -74,27 +103,32 @@ def login_view(request):
 @csrf_exempt
 def logout_view(request):
     if request.method == "POST":
+        response = JsonResponse({"message": "Вихід успішний"})
+        cookies = request.COOKIES.keys()  
+        for cookie in cookies:
+            response.delete_cookie(cookie) 
+        if 'access_token' in request.session:
+            del request.session['access_token']
         logout(request)
-        return JsonResponse({"message": "Вихід успішний"})
+        return response
 
     return JsonResponse({"error": "Метод не дозволений"}, status=405)
 
 
 class UserProfileView(generics.RetrieveAPIView):
     serializer_class = UserProfileSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
-        user_id = self.kwargs.get('user_id')
-        if user_id:
-            return get_object_or_404(CustomUser, id=user_id)
+        username = self.kwargs.get('username')
+        if username:
+            return get_object_or_404(CustomUser, username=username)
         else:
             return self.request.user
 
-
-def get_posts(self, obj):
-        posts = Post.objects.filter(author=obj).order_by('-created_at')
-        return PostSerializer(posts, many=True).data
+    def get_posts(self, obj):
+            posts = Post.objects.filter(author=obj).order_by('-created_at')
+            return PostSerializer(posts, many=True).data
 
 
 class UserProfileEditAPIView(APIView):
@@ -105,7 +139,10 @@ class UserProfileEditAPIView(APIView):
         return Response(serializer.data)
 
     def put(self, request):
-        serializer = UserProfileEditSerializer(request.user, data=request.data, partial=True)
+        data = request.data.copy()
+        if "avatar" in request.FILES:
+            data["avatar"] = request.FILES["avatar"]
+        serializer = UserProfileEditSerializer(request.user, data=data, partial=True)
 
         if serializer.is_valid():
             serializer.save()
@@ -114,10 +151,11 @@ class UserProfileEditAPIView(APIView):
 
 
 class FollowUserAPIView(APIView):
+    serializer_class = UserProfileShortSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, user_id):
-        following_user = get_object_or_404(CustomUser, id=user_id)
+    def post(self, request, username):
+        following_user = get_object_or_404(CustomUser, username=username)
 
         if request.user == following_user:
             return Response({"error": "Не можна підписатися на себе"}, status=status.HTTP_400_BAD_REQUEST)
@@ -126,32 +164,36 @@ class FollowUserAPIView(APIView):
 
         if not created:
             follow.delete()
-            return Response({"message": "Відписка успішна"}, status=status.HTTP_200_OK)
+            serializer = self.serializer_class(following_user, context={"request": request})
+            return Response({"message": "Відписка успішна", "user": serializer.data }, status=status.HTTP_200_OK)
 
-        return Response({"message": "Підписка успішна"}, status=status.HTTP_201_CREATED)
+        serializer = self.serializer_class(following_user, context={"request": request})
+        return Response({"message": "Підписка успішна", "user": serializer.data }, status=status.HTTP_201_CREATED)
 
 
 class FollowersListAPIView(generics.ListAPIView):
     serializer_class = UserProfileShortSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        user_id = self.kwargs["user_id"]
-        return CustomUser.objects.filter(following__following_id=user_id)
+        username = self.kwargs["username"]
+        user = CustomUser.objects.get(username=username)
+        return CustomUser.objects.filter(following__following=user).distinct()
 
 
 class FollowingListAPIView(generics.ListAPIView):
     serializer_class = UserProfileShortSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        user_id = self.kwargs["user_id"]
-        return CustomUser.objects.filter(followers__follower_id=user_id)
+        username = self.kwargs["username"]
+        user = CustomUser.objects.get(username=username)
+        return CustomUser.objects.filter(followers__follower=user).distinct()
 
 
 class UserSearchAPIView(generics.ListAPIView):
     serializer_class = UserProfileShortSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         query = self.request.query_params.get("q", "").strip()
@@ -175,11 +217,10 @@ class CreateChatAPIView(APIView):
         existing_chat = Chat.objects.filter(user1=user1, user2=user2) | Chat.objects.filter(user1=user2, user2=user1)
 
         if existing_chat.exists():
-            return Response({"message": "Чат уже існує."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Чат вже існує."}, status=status.HTTP_400_BAD_REQUEST)
 
         chat = Chat.objects.create(user1=user1, user2=user2)
         return Response({"message": "Чат успішно створено.", "chat_id": chat.id}, status=status.HTTP_201_CREATED)
-
 
 
 class ChatListAPIView(generics.ListAPIView):
@@ -219,15 +260,14 @@ class MessageListCreateAPIView(generics.ListCreateAPIView):
 
         return Message.objects.filter(chat_id=chat_id)
 
-
     def perform_create(self, serializer):
-            chat_id = self.kwargs['chat_id']
-            chat = Chat.objects.get(id=chat_id)
+        chat_id = self.kwargs['chat_id']
+        chat = Chat.objects.get(id=chat_id)
 
-            if self.request.user not in [chat.user1, chat.user2]:
-                raise serializers.ValidationError("Неможливо надіслати повідомлення.")
+        if self.request.user not in [chat.user1, chat.user2]:
+            raise serializers.ValidationError("Неможливо надіслати повідомлення.")
 
-            serializer.save(chat=chat, sender=self.request.user)
+        serializer.save(chat=chat, sender=self.request.user)
 
 
 class MessageReadAPIView(generics.UpdateAPIView):
