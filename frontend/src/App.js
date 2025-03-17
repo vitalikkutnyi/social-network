@@ -4,13 +4,11 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
-import EditProfile from './pages/EditProfile';
-import FollowList from './pages/FollowList';
-import ChatList from './pages/ChatList';
-import ChatDetail from './pages/ChatDetail';
-import UserProfile from './pages/UserProfile';
-import UserSearch from './pages/UserSearch';
-import HomePage from './pages/HomePage';
+import EditProfile from "./pages/EditProfile";
+import FollowersList from "./pages/FollowersList";
+import FollowingList from "./pages/FollowingList";
+import PostDetailPage from "./pages/PostDetailPage";
+import Comments from "./pages/Comments";
 
 function App() {
   return (
@@ -18,16 +16,14 @@ function App() {
         <Router>
             <Routes>
                 <Route path="/register/" element={<Register />} />
-                {/* <Route path="/login/" element={<Login />} />
+                <Route path="/login/" element={<Login />} />
                 <Route path="/profile/" element={<Profile />} />
-                <Route path="/profile/edit/" element={<EditProfile />} />
-                <Route path="/profile/:user_id/follow/" element={<FollowList />} />
-                <Route path="/profile/int:user_id/followers/" element={<FollowList />} />
-                <Route path="/chats/" element={<ChatList />} />
-                <Route path="/chats/:pk/" element={<ChatDetail />} />
-                <Route path="/profile/:user_id/" element={<UserProfile />} />
-                <Route path="/profile/search/" element={<UserSearch />} />
-                <Route path="/homepage/" element={<HomePage />} /> */}
+                <Route path="/profile/:username/" element={<Profile />} />
+                <Route path="/profile/edit/" element={<EditProfile />}/>
+                <Route path="/profile/:username/followers/" element={<FollowersList />} />
+                <Route path="/profile/:username/following/" element={<FollowingList />} />
+                <Route path="/profile/:username/posts/:pk/" element={<PostDetailPage />} />
+                <Route path="/profile/:username/posts/:postId/comments/" element={<Comments />} />
             </Routes>
         </Router>
     </div>
