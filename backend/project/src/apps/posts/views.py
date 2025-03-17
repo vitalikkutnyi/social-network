@@ -4,9 +4,10 @@ from rest_framework import generics, permissions, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import Post, Like, Comment
+from rest_framework.exceptions import PermissionDenied
+from .models import Post, Like, Comment, CustomUser
 from .serializers import PostSerializer, CommentSerializer
-from ..users.models import Subscription
+from ..users.models import CustomUser, Subscription
 
 
 class HomePagePostListAPIView(generics.ListAPIView):
@@ -25,7 +26,7 @@ class HomePagePostListAPIView(generics.ListAPIView):
 class HomePagePostDetailAPIView(generics.RetrieveAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class PostListCreateAPIView(generics.ListCreateAPIView):
@@ -33,14 +34,25 @@ class PostListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        queryset = Post.objects.all()
+        username = self.request.query_params.get("username")
+        if username:
+            queryset = queryset.filter(author__username=username)
+        return queryset
+
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
 
 class PostDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        username = self.kwargs.get("username")
+        post_id = self.kwargs.get("pk") 
+        return get_object_or_404(Post, author__username=username, id=post_id)
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -57,20 +69,46 @@ class PostDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
             return Response({"detail": "Не дозволено видаляти чужий пост"}, status=status.HTTP_403_FORBIDDEN)
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+class PostUpdateAPIView(generics.UpdateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        post = super().get_object()
+        if post.author.username != self.kwargs['username']:
+            raise PermissionDenied("Ви не можете редагувати цей пост.")
+        return post
+    
+
+class PostDestroyAPIView(generics.DestroyAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        post = super().get_object()
+        if post.author.username != self.kwargs['username']:
+            raise PermissionDenied("Ви не можете видаляти цей пост.")
+        return post
 
 
 class LikePostAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = PostSerializer
 
-    def post(self, request, post_id):
+    def post(self, request, username, post_id):
         post = get_object_or_404(Post, id=post_id)
-        like, created = Like.objects.get_or_create(user=request.user, post=post)
-
-        if not created:
+        user = request.user
+        like = Like.objects.filter(user=user, post=post).first()
+        if like:
             like.delete()
-            return Response({"message": "Лайк видалено"}, status=200)
-
-        return Response({"message": "Лайк додано"}, status=201)
+            return Response({"message": "Лайк видалено"}, status=status.HTTP_200_OK)
+        else:
+            Like.objects.create(user=user, post=post)
+            return Response({"message": "Лайк додано"}, status=status.HTTP_201_CREATED)
 
 
 class CommentListCreateAPIView(generics.ListCreateAPIView):
@@ -90,5 +128,18 @@ class CommentDeleteAPIView(generics.DestroyAPIView):
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        return Comment.objects.filter(author=self.request.user)
+    def get_object(self):
+        post_id = self.kwargs["post_id"]
+        comment_id = self.kwargs["pk"]
+        comment = get_object_or_404(
+            Comment,
+            id=comment_id,
+            post_id=post_id,
+        )
+        return comment
+
+    def perform_destroy(self, instance):
+        post = instance.post
+        if instance.author != self.request.user and (self.request.user != post.author and not self.request.user.is_staff):
+            raise permissions.PermissionDenied("Ви можете видаляти лише свої коментарі або коментарі до власного посту.")
+        instance.delete()
