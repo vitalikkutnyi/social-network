@@ -75,6 +75,7 @@
     font-size: 14px;
     color: #333;
     cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .post-actions-menu button:hover {
@@ -127,6 +128,7 @@
     font-size: 14px;
     color: #333;
     transition: background 0.2s;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .edit-save-button:hover,
@@ -141,13 +143,13 @@
 }
 
 .edit-save-button {
-    background: #4CAF50; /* Зелений */
+    background: #007bff; 
     color: #fff;
     border: none;
 }
 
 .edit-save-button:hover:not(:disabled) {
-    background: #45a049;
+    background: #0f83ff;
 }
 
 .edit-cancel-button {
