@@ -50,7 +50,7 @@ const FollowButton = ({ username, initialFollowing, setUser }) => {
                     ? prevUser.followers_count + 1
                     : prevUser.followers_count - 1,
             }));
-
+            
         } catch (err) {
             if (err.response?.status === 400) {
                 setError("Не можна підписатися на себе.");
@@ -71,7 +71,7 @@ const FollowButton = ({ username, initialFollowing, setUser }) => {
             <button
                 onClick={handleToggleFollow}
                 disabled={loading}
-                className={`follow-button ${isFollowing ? "following" : "not-following"}`}
+                className={`follow-button ${isFollowing ? "following" : "not-following"}` } 
             >
                 {loading ? "Завантаження..." : isFollowing ? "Відписатися" : "Підписатися"}
             </button>
