@@ -1,6 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,600;1,600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,600;1,600&display=swap");
 
-body, #app {
+body,
+#app {
   font-family: "Montserrat", sans-serif;
   background-color: #f4f4f9;
   margin: 0;
@@ -8,12 +9,13 @@ body, #app {
   min-height: 100vh;
   color: #333;
   width: 100%;
+  overflow: hidden;
 }
 
 .sidebar + .main-content {
-    margin-left: 300px;
-    width: calc(100% - 300px); 
-    display: flex; 
-    justify-content: center;
-    align-items: center; 
+  margin-left: 300px;
+  width: calc(100% - 300px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

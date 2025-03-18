@@ -1,218 +1,219 @@
 .post-container {
-    width: clamp(620px, 90%, 800px); 
-    margin: 20px auto;
-    padding: 20px;
-    font-family: 'Montserrat', sans-serif;
-    background-color: #fff;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
+  width: clamp(620px, 90%, 800px);
+  margin: 20px auto;
+  padding: 20px;
+  font-family: "Montserrat", sans-serif;
+  background-color: #fff;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
 }
 
 .post-container-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
 }
 
 .post-container-user {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .post-container-user img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .post-container-user strong {
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
 }
 
 .post-menu {
-    position: relative;
+  position: relative;
 }
 
 .menu-button {
-    background: none;
-    border: none;
-    padding: 5px;
-    cursor: pointer;
-    font-size: 18px;
-    color: #555;
+  background: none;
+  border: none;
+  padding: 5px;
+  cursor: pointer;
+  font-size: 18px;
+  color: #555;
 }
 
 .menu-button:hover {
-    color: #000;
+  color: #000;
 }
 
 .post-actions-menu {
-    position: absolute;
-    top: 30px;
-    right: 0;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    z-index: 10;
-    width: 150px;
+  position: absolute;
+  top: 30px;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  width: 150px;
 }
 
 .post-actions-menu button {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    width: 100%;
-    padding: 8px 12px;
-    background: none;
-    border: none;
-    text-align: left;
-    font-size: 14px;
-    color: #333;
-    cursor: pointer;
-    font-family: 'Montserrat', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  font-family: "Montserrat", sans-serif;
 }
 
 .post-actions-menu button:hover {
-    background: #f0f0f0;
+  background: #f0f0f0;
 }
 
 .post-actions-menu button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .edit-form {
-    margin: 10px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  margin: 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .edit-textarea {
-    width: 100%;
-    min-height: 100px;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-    resize: vertical;
-    box-sizing: border-box;
-    font-family: inherit;
+  width: 100%;
+  min-height: 100px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  resize: vertical;
+  box-sizing: border-box;
+  font-family: inherit;
 }
 
 .edit-textarea:focus {
-    outline: none;
-    border-color: #555;
-    box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+  outline: none;
+  border-color: #555;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
 }
 
 .edit-button-group {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
 }
 
 .edit-save-button,
 .edit-cancel-button {
-    padding: 6px 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: #fff;
-    cursor: pointer;
-    font-size: 14px;
-    color: #333;
-    transition: background 0.2s;
-    font-family: 'Montserrat', sans-serif;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: background 0.2s;
+  font-family: "Montserrat", sans-serif;
 }
 
 .edit-save-button:hover,
 .edit-cancel-button:hover {
-    background: #f0f0f0;
+  background: #f0f0f0;
 }
 
 .edit-save-button:disabled,
 .edit-cancel-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .edit-save-button {
-    background: #007bff; 
-    color: #fff;
-    border: none;
+  background: #007bff;
+  color: #fff;
+  border: none;
 }
 
 .edit-save-button:hover:not(:disabled) {
-    background: #0f83ff;
+  background: #0f83ff;
 }
 
 .edit-cancel-button {
-    background: #fff;
-    border: 1px solid #ccc;
+  background: #fff;
+  border: 1px solid #ccc;
 }
 
 .post-text {
-    font-size: 1.2rem;
-    color: #333;
-    margin-bottom: 15px;
-    word-wrap: break-word; 
-    overflow-wrap: break-word; 
-    word-break: break-all; 
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 15px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-all;
 }
 
 .post-media {
-    max-width: 100%;
-    border-radius: 10px;
-    margin: 15px 0;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  max-width: 100%;
+  border-radius: 10px;
+  margin: 15px 0;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
 }
 
 .post-audio {
-    width: 100%;
-    border-radius: 8px;
-    margin-top: 10px;
+  width: 100%;
+  border-radius: 8px;
+  margin-top: 10px;
 }
 
 .post-meta {
-    display: flex;
-    justify-content: space-between;
-    font-size: 1rem;
-    color: #777;
-    margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 1rem;
+  color: #777;
+  margin-top: 15px;
 }
 
 .post-meta-left {
-    display: flex;
-    gap: 15px; 
+  display: flex;
+  gap: 15px;
 }
 
 .post-meta span {
-    display: flex;
-    align-items: center;
-    gap: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 img {
-    max-width: 100%;
-    border-radius: 10px;
+  max-width: 100%;
+  border-radius: 10px;
 }
 
 video {
-    width: 100%;
-    border-radius: 10px;
-    margin-bottom: 15px;
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 15px;
 }
 
-.io-heart, .fa-comment {
-    font-size: 1.2rem;
+.io-heart,
+.fa-comment {
+  font-size: 1.2rem;
 }
 
 .liked {
-    color: #ff4444;
+  color: #ff4444;
 }
