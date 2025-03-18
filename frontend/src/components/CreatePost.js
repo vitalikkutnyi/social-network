@@ -120,7 +120,11 @@ const CreatePost = ({ username, onPostCreated }) => {
                 <button type="submit" disabled={postLoading}>
                   {postLoading ? "Створення..." : "Опублікувати"}
                 </button>
-                <button type="button" onClick={toggleCreatePost} disabled={postLoading}>
+                <button
+                  type="button"
+                  onClick={toggleCreatePost}
+                  disabled={postLoading}
+                >
                   Скасувати
                 </button>
               </div>
