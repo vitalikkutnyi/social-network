@@ -76,17 +76,24 @@ class MessageSerializer(serializers.ModelSerializer):
 
 class ChatSerializer(serializers.ModelSerializer):
     other_user = serializers.SerializerMethodField()
+    avatar_url = serializers.SerializerMethodField()
     last_message = serializers.SerializerMethodField()
+    created_at = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = Chat
-        fields = '__all__'
+        fields = ["id", "other_user", "avatar_url", "last_message", "created_at"]
 
     def get_other_user(self, obj):
         request = self.context.get('request')
         if obj.user1 == request.user:
             return obj.user2.username
         return obj.user1.username
+    
+    def get_avatar_url(self, obj):
+        request_user = self.context["request"].user
+        other_user = obj.user2 if obj.user1 == request_user else obj.user1
+        return other_user.avatar.url if other_user.avatar else None
 
     def get_last_message(self, obj):
         last_message = obj.messages.order_by('sent_at').last()

@@ -217,10 +217,11 @@ class CreateChatAPIView(APIView):
         existing_chat = Chat.objects.filter(user1=user1, user2=user2) | Chat.objects.filter(user1=user2, user2=user1)
 
         if existing_chat.exists():
-            return Response({"message": "Чат вже існує."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Чат уже існує."}, status=status.HTTP_400_BAD_REQUEST)
 
         chat = Chat.objects.create(user1=user1, user2=user2)
-        return Response({"message": "Чат успішно створено.", "chat_id": chat.id}, status=status.HTTP_201_CREATED)
+        serializer = ChatSerializer(chat, context={"request": request}) 
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class ChatListAPIView(generics.ListAPIView):
