@@ -104,7 +104,6 @@ const Comments = ({ onCommentAdded }) => {
       await API.delete(
         `/profile/${username}/posts/${postId}/comments/${commentId}/delete/`
       );
-
       setComments(comments.filter((comment) => comment.id !== commentId));
       setPost((prevPost) => ({
         ...prevPost,
