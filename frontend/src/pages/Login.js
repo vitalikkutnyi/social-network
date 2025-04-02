@@ -1,12 +1,11 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import AuthForm from "../components/AuthForm";
-import API from "../API";
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [otpCode, setOtpCode] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
@@ -17,15 +16,20 @@ function Login() {
     const data = {
       username,
       password,
-      otp_code: otpCode,
     };
 
     try {
-      const response = await API.post("/login/", data);
+      const response = await axios.post("http://localhost:8000/login/", data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (response.data.message) {
         setMessage(response.data.message);
         setError("");
+        localStorage.setItem("access_token", response.data.access_token);
+        localStorage.setItem("refresh_token", response.data.refresh_token);
         navigate(`/profile/`);
       }
     } catch (error) {
@@ -38,10 +42,6 @@ function Login() {
     }
   };
 
-  const handleContinue = () => {
-    navigate("/profile/");
-  };
-
   return (
     <AuthForm
       title="Авторизація"
@@ -50,20 +50,17 @@ function Login() {
       setUsername={setUsername}
       password={password}
       setPassword={setPassword}
-      otpCode={otpCode}
-      setOtpCode={setOtpCode}
       error={error}
       message={message}
       buttonText="Увійти"
       anotherContent={
         <>
           <p>Ще не зареєстровані?</p>
-          <button type="button" onClick={() => navigate("/register/")}>
+          <button type="button" onClick={() => navigate("/register")}>
             Зареєструватися
           </button>
         </>
       }
-      onContinue={handleContinue}
     />
   );
 }
