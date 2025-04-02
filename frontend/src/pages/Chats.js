@@ -161,7 +161,6 @@ const Chats = () => {
           +
         </button>
       </div>
-
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
