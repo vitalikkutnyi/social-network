@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API from "../API";
 
 const EditProfile = () => {
   const [data, setData] = useState({
@@ -13,14 +13,6 @@ const EditProfile = () => {
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
 
-  const token = localStorage.getItem("access_token");
-
-  useEffect(() => {
-    if (!token) {
-      navigate("/login");
-    }
-  }, [token, navigate]);
-
   const goToProfile = () => {
     navigate("/profile");
   };
@@ -28,12 +20,7 @@ const EditProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await axios.get(
-          "http://127.0.0.1:8000/profile/edit/",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await API.get("/profile/edit/");
 
         setData({
           username: response.data.username,
@@ -45,7 +32,7 @@ const EditProfile = () => {
       }
     };
     fetchProfile();
-  }, [token]);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -74,16 +61,11 @@ const EditProfile = () => {
     }
 
     try {
-      const response = await axios.put(
-        "http://127.0.0.1:8000/profile/edit/",
-        dataToSend,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await API.put("/profile/edit/", dataToSend, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       setData({
         username: response.data.username,
@@ -96,6 +78,16 @@ const EditProfile = () => {
       console.error(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      await API.delete("/profile/edit/");
+      navigate("/login/");
+    } catch (error) {
+      console.error("Помилка видалення акаунта:", error);
+      setError("Не вдалося видалити акаунт.");
     }
   };
 
@@ -143,22 +135,33 @@ const EditProfile = () => {
           type="text"
           name="username"
           id="username"
-          value={data.username}
+          value={data.username || ""}
           onChange={handleChange}
         />
         <label htmlFor="bio">Біографія:</label>
         <textarea
+          type="text"
           name="bio"
           id="bio"
-          value={data.bio}
+          value={data.bio || ""}
           onChange={handleChange}
-        ></textarea>
+        />
         <div className="buttons">
           <button type="submit" disabled={loading}>
             {loading ? "Оновлення..." : "Зберегти зміни"}
           </button>
           <button type="button" onClick={goToProfile}>
             Назад
+          </button>
+        </div>
+        <div className="separator"></div>
+        <div className="profile-delete-container">
+          <button
+            type="button"
+            onClick={handleDeleteAccount}
+            className="profile-delete-button"
+          >
+            Видалити акаунт
           </button>
         </div>
       </form>
