@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API from "../API";
+import { RiUserUnfollowLine, RiUserFollowLine } from "react-icons/ri";
 
-const FollowButton = ({ username, initialFollowing, setUser }) => {
+const FollowButton = ({ username, initialFollowing, setUser, icon: Icon }) => {
   const [isFollowing, setIsFollowing] = useState(initialFollowing);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -23,19 +24,11 @@ const FollowButton = ({ username, initialFollowing, setUser }) => {
     setError(null);
 
     try {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        setError("Увійдіть у систему.");
-        navigate("/login");
-        return;
-      }
-
-      const response = await axios.post(
-        `http://127.0.0.1:8000/profile/${username}/follow/`,
+      const response = await API.post(
+        `/profile/${username}/follow/`,
         {},
         {
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -46,6 +39,7 @@ const FollowButton = ({ username, initialFollowing, setUser }) => {
 
       setUser((prevUser) => ({
         ...prevUser,
+        is_following: newFollowingState,
         followers_count: newFollowingState
           ? prevUser.followers_count + 1
           : prevUser.followers_count - 1,
@@ -65,6 +59,8 @@ const FollowButton = ({ username, initialFollowing, setUser }) => {
     }
   };
 
+  const FollowIcon = isFollowing ? RiUserUnfollowLine : RiUserFollowLine;
+
   return (
     <div>
       <button
@@ -74,11 +70,14 @@ const FollowButton = ({ username, initialFollowing, setUser }) => {
           isFollowing ? "following" : "not-following"
         }`}
       >
-        {loading
-          ? "Завантаження..."
-          : isFollowing
-          ? "Відписатися"
-          : "Підписатися"}
+        <FollowIcon className="follow-icon" />
+        <span className="follow-text">
+          {loading
+            ? "Завантаження..."
+            : isFollowing
+            ? "Відписатися"
+            : "Підписатися"}
+        </span>
       </button>
     </div>
   );
