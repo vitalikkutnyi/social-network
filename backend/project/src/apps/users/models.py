@@ -1,10 +1,18 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django_otp.plugins.otp_totp.models import TOTPDevice
 
 
 class CustomUser(AbstractUser):
     avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
     bio = models.CharField(max_length=255, blank=True, null=True)
+
+@receiver(post_save, sender=CustomUser)
+def create_2fa_device(sender, instance, created, **kwargs):
+    if created:
+        TOTPDevice.objects.create(user=instance, name='default', confirmed=True)
 
 
 class Subscription(models.Model):
