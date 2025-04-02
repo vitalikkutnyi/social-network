@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { FaImage, FaVideo, FaMusic } from "react-icons/fa";
+import API from "../API";
 
 const CreatePost = ({ username, onPostCreated }) => {
   const [showCreatePost, setShowCreatePost] = useState(false);
@@ -32,13 +32,11 @@ const CreatePost = ({ username, onPostCreated }) => {
     if (postAudio) formData.append("audio", postAudio);
 
     try {
-      const token = localStorage.getItem("access_token");
-      const response = await axios.post(
-        `http://127.0.0.1:8000/profile/${username}/posts/create/`,
+      const response = await API.post(
+        `/profile/${username}/posts/create/`,
         formData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
         }
