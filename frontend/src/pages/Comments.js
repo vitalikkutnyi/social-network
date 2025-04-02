@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import { FaTrash } from "react-icons/fa";
 import Post from "../components/Post";
+import API from "../API";
 
 const Comments = ({ onCommentAdded }) => {
   const { postId, username } = useParams();
@@ -18,37 +18,17 @@ const Comments = ({ onCommentAdded }) => {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const token = localStorage.getItem("access_token");
-        if (!token) {
-          setError("Токен відсутній, будь ласка, увійдіть.");
-          navigate("/login");
-          return;
-        }
-        const userResponse = await axios.get(`http://127.0.0.1:8000/profile/`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const userResponse = await API.get(`/profile/`);
         setCurrentUser(userResponse.data.username);
 
-        const postResponse = await axios.get(
-          `http://127.0.0.1:8000/profile/${username}/posts/${postId}/`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        const postResponse = await API.get(
+          `/profile/${username}/posts/${postId}/`
         );
         setPost(postResponse.data);
         setPostOwner(postResponse.data.author);
 
-        const response = await axios.get(
-          `http://127.0.0.1:8000/profile/${username}/posts/${postId}/comments/`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        const response = await API.get(
+          `/profile/${username}/posts/${postId}/comments/`
         );
         setComments(response.data.reverse());
       } catch (err) {
@@ -89,14 +69,9 @@ const Comments = ({ onCommentAdded }) => {
         return;
       }
 
-      const response = await axios.post(
-        `http://127.0.0.1:8000/profile/${username}/posts/${postId}/comments/`,
-        { text: newComment },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const response = await API.post(
+        `/profile/${username}/posts/${postId}/comments/`,
+        { text: newComment }
       );
       setComments([response.data, ...comments]);
       setNewComment("");
@@ -126,13 +101,8 @@ const Comments = ({ onCommentAdded }) => {
         return;
       }
 
-      await axios.delete(
-        `http://127.0.0.1:8000/profile/${username}/posts/${postId}/comments/${commentId}/delete/`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      await API.delete(
+        `/profile/${username}/posts/${postId}/comments/${commentId}/delete/`
       );
 
       setComments(comments.filter((comment) => comment.id !== commentId));
@@ -148,11 +118,11 @@ const Comments = ({ onCommentAdded }) => {
   };
 
   return (
-    <div>
+    <div className="comments-container">
       {loading ? (
         <p>Завантаження...</p>
       ) : post ? (
-        <div className="comments-post-container">
+        <span className="comments-post-container">
           <Post
             key={post.id}
             post={post}
@@ -160,7 +130,7 @@ const Comments = ({ onCommentAdded }) => {
             disableNavigation={true}
             hideMenu={true}
           />
-        </div>
+        </span>
       ) : (
         <p>Допис не знайдено або видалено.</p>
       )}
