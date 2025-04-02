@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { IoIosHeart } from "react-icons/io";
 import {
   FaComment,
   FaPenToSquare,
   FaTrashCan,
   FaEllipsisVertical,
+  FaThumbtack,
+  FaThumbtackSlash,
+  FaShare,
 } from "react-icons/fa6";
+import { GrFormPin } from "react-icons/gr";
 import { useNavigate } from "react-router-dom";
+import API from "../API";
 
 const Post = ({
   post,
@@ -16,6 +20,8 @@ const Post = ({
   disableNavigation,
   hideMenu = false,
   onCommentAdded,
+  onPinToggle,
+  onRepost,
 }) => {
   const {
     id,
@@ -27,12 +33,19 @@ const Post = ({
     likes_count,
     comments_count,
     is_liked_by_user,
+    is_pinned = false,
+    is_repost = false,
+    reposts_count = 0,
+    original_author_username,
+    original_author_avatar,
+    is_editable = true,
   } = post;
 
   const [isLiked, setIsLiked] = useState(is_liked_by_user || false);
   const [likesCount, setLikesCount] = useState(likes_count);
   const [commentsCount, setCommentsCount] = useState(comments_count);
-  const [loading, setLoading] = useState(false);
+  const [repostsCount, setRepostsCount] = useState(reposts_count);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
@@ -43,33 +56,45 @@ const Post = ({
   const [isDeleted, setIsDeleted] = useState(false);
   const navigate = useNavigate();
 
+  const renderTextWithHashtags = (text) => {
+    if (!text) return null;
+    const hashtagRegex = /(#\w+)/g;
+    const parts = text.split(hashtagRegex);
+
+    return parts.map((part, index) => {
+      if (part.match(hashtagRegex)) {
+        return (
+          <span
+            key={index}
+            className="hashtag"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/search?query=${encodeURIComponent(part)}`);
+            }}
+          >
+            {part}
+          </span>
+        );
+      }
+      return part;
+    });
+  };
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = localStorage.getItem("access_token");
-        if (!token) return;
+        const [currentUserResponse, userResponse] = await Promise.all([
+          API.get(`/profile/`, {}),
+          API.get(`/profile/${username}/`, {}),
+        ]);
 
-        const currentUserResponse = await axios.get(
-          `http://127.0.0.1:8000/profile/`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
         setCurrentUser(currentUserResponse.data.username);
-
-        const response = await axios.get(
-          `http://127.0.0.1:8000/profile/${username}/`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setUser(response.data);
+        setUser(userResponse.data);
       } catch (err) {
         console.error("Помилка при завантаженні профілю користувача:", err);
+        setError("Не вдалося завантажити дані користувача.");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -96,7 +121,34 @@ const Post = ({
     setLikesCount(likes_count);
     setIsLiked(is_liked_by_user || false);
     setCommentsCount(comments_count);
+    setRepostsCount(reposts_count);
+    setCurrentPost(post);
   }, [id, likes_count, is_liked_by_user, comments_count]);
+
+  const handleRepost = async (e) => {
+    e.stopPropagation();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await API.post(
+        `/profile/${currentUser}/posts/${id}/repost/`,
+        {}
+      );
+      setRepostsCount(response.data.reposts_count);
+      setCurrentPost({
+        ...currentPost,
+        reposts_count: response.data.reposts_count,
+      });
+      if (onRepost) {
+        onRepost(id, response.data);
+      }
+    } catch (err) {
+      setError(err.response?.data?.detail || "Не вдалося зробити репост.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLikeToggle = async (e) => {
     e.stopPropagation();
@@ -104,21 +156,9 @@ const Post = ({
     setError(null);
 
     try {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        setError("Увійдіть.");
-        setLoading(false);
-        return;
-      }
-
-      const response = await axios.post(
-        `http://127.0.0.1:8000/profile/${username}/posts/${id}/like/`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const response = await API.post(
+        `/profile/${username}/posts/${id}/like/`,
+        {}
       );
 
       if (response.data.message === "Лайк додано") {
@@ -139,6 +179,11 @@ const Post = ({
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLikesCountClick = (e) => {
+    e.stopPropagation();
+    navigate(`/profile/${username}/posts/${id}/likes/`);
   };
 
   const handlePostClick = () => {
@@ -166,17 +211,11 @@ const Post = ({
     const data = { text: editedText };
 
     try {
-      const token = localStorage.getItem("access_token");
-      await axios.put(
-        `http://127.0.0.1:8000/profile/${username}/posts/${id}/`,
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      await API.put(`/profile/${username}/posts/${id}/update/`, data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       setIsEditing(false);
       setCurrentPost({ ...currentPost, text: editedText });
     } catch (err) {
@@ -191,13 +230,7 @@ const Post = ({
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("access_token");
-      await axios.delete(
-        `http://127.0.0.1:8000/profile/${username}/posts/${id}/`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      await API.delete(`/profile/${username}/posts/${id}/delete/`);
       setIsDeleted(true);
       onDelete(id);
     } catch (err) {
@@ -208,13 +241,49 @@ const Post = ({
     }
   };
 
+  const handlePinToggle = async (e) => {
+    e.stopPropagation();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await API.post(
+        `/profile/${username}/posts/${id}/pin/`,
+        {}
+      );
+      const newPinnedStatus = response.data.is_pinned;
+      setCurrentPost({ ...currentPost, is_pinned: newPinnedStatus });
+      setShowMenu(false);
+      if (onPinToggle) {
+        onPinToggle(id, newPinnedStatus);
+      }
+    } catch (err) {
+      setError(err.response?.data?.detail || "Не вдалося закріпити допис.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const toggleMenu = (e) => {
     e.stopPropagation();
     setShowMenu(!showMenu);
   };
 
+  const handleUserClick = (e, targetUsername) => {
+    e.stopPropagation();
+    navigate(`/profile/${targetUsername}`);
+  };
+
   const isAuthor = currentUser && currentUser === username;
   if (isDeleted) return null;
+
+  if (loading || !user || !currentUser) {
+    return (
+      <div className="post-container loading">
+        <p>Завантаження...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="post-container" onClick={handlePostClick}>
@@ -229,25 +298,60 @@ const Post = ({
             ) : (
               <img src={"http://127.0.0.1:8000/media/avatars/avatar.jpg"} />
             )}
-            <strong>{user.username}</strong>
-          </div>
-          {isAuthor && !isEditing && !hideMenu && (
-            <div className="post-menu">
-              <button className="menu-button" onClick={toggleMenu}>
-                <FaEllipsisVertical />
-              </button>
-              {showMenu && (
-                <div className="post-actions-menu">
-                  <button onClick={handleEditToggle}>
-                    <FaPenToSquare /> Редагувати
-                  </button>
-                  <button onClick={handleDelete} disabled={loading}>
-                    <FaTrashCan /> {loading ? "Видалення..." : "Видалити"}
-                  </button>
-                </div>
+            <span>
+              <strong>{user.username}</strong>
+              {currentPost.is_repost && (
+                <span className="repost-info">
+                  Репост із{" "}
+                  <a
+                    href={`/profile/${currentPost.original_author_username}`}
+                    onClick={(e) =>
+                      handleUserClick(e, currentPost.original_author_username)
+                    }
+                  >
+                    {currentPost.original_author_username}
+                  </a>
+                </span>
               )}
-            </div>
-          )}
+            </span>
+          </div>
+          <div className="post-header-right">
+            {currentPost.is_pinned && (
+              <span className="pinned">
+                <GrFormPin />
+              </span>
+            )}
+            {is_editable && isAuthor && !isEditing && (
+              <div className="post-menu">
+                <button className="menu-button" onClick={toggleMenu}>
+                  <FaEllipsisVertical />
+                </button>
+                {showMenu && (
+                  <div className="post-actions-menu">
+                    {!currentPost.is_repost && (
+                      <button onClick={handleEditToggle}>
+                        <FaPenToSquare /> Редагувати
+                      </button>
+                    )}
+                    <button onClick={handleDelete} disabled={loading}>
+                      <FaTrashCan /> {loading ? "Видалення..." : "Видалити"}
+                    </button>
+                    <button onClick={handlePinToggle} disabled={loading}>
+                      {currentPost.is_pinned ? (
+                        <>
+                          <FaThumbtackSlash /> Відкріпити
+                        </>
+                      ) : (
+                        <>
+                          <FaThumbtack /> Закріпити
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
       <div>
@@ -265,7 +369,9 @@ const Post = ({
           </audio>
         )}
         {!isEditing && currentPost.text && (
-          <p className="post-text">{currentPost.text}</p>
+          <p className="post-text">
+            {renderTextWithHashtags(currentPost.text)}
+          </p>
         )}
       </div>
       {isEditing && (
@@ -301,17 +407,22 @@ const Post = ({
       )}
       <div className="post-meta">
         <div className="post-meta-left">
-          <span
-            onClick={handleLikeToggle}
-            className={isLiked ? "liked" : "unliked"}
-          >
-            <IoIosHeart />
-            {likesCount}
+          <span className={isLiked ? "liked" : "unliked"}>
+            <span onClick={handleLikeToggle}>
+              <IoIosHeart />
+            </span>
+            <span onClick={handleLikesCountClick}>{likesCount}</span>
           </span>
           <span onClick={handleCommentsClick}>
             <FaComment />
             {commentsCount}
           </span>
+          {!currentPost.is_repost && (
+            <span onClick={handleRepost}>
+              <FaShare />
+              {repostsCount > 0 && <span>{repostsCount}</span>}
+            </span>
+          )}
         </div>
         <span>
           {formattedTime} год. • {formattedDate}
