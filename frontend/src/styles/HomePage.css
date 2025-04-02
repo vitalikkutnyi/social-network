@@ -1,0 +1,74 @@
+.homepage-container {
+  width: 100%;
+  max-width: 720px;
+  margin: 20px auto 0;
+  padding: 20px;
+  font-family: "Montserrat", sans-serif;
+  box-sizing: border-box;
+  height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: column;
+}
+
+.homepage-container h2 {
+  font-family: "Montserrat", sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 20px;
+  text-align: left;
+  flex-shrink: 0;
+}
+
+.posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 10px 15px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  flex-grow: 1;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.posts-list .post-container {
+  width: 100%;
+  max-width: 700px;
+  margin: 0;
+  padding: 20px;
+  font-family: "Montserrat", sans-serif;
+  background-color: #fff;
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.posts-list .post-container:first-child {
+  margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .homepage-container {
+    max-width: calc(100% - 30px);
+    height: calc(100vh - 50px);
+  }
+
+  .posts-list {
+    padding: 0 5px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .homepage-container {
+    max-width: calc(100% - 20px);
+  }
+
+  .homepage-container h2 {
+    font-size: 20px;
+  }
+
+  .posts-list .post-container {
+    padding: 15px;
+  }
+}
