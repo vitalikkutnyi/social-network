@@ -1,5 +1,9 @@
 .follow-button {
-  padding: 12px 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 20px;
   font-size: 1rem;
   color: #fff;
   border: none;
@@ -7,6 +11,10 @@
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
   font-family: "Montserrat", sans-serif;
+  min-width: 120px;
+  box-sizing: border-box;
+  white-space: nowrap;
+  flex-shrink: 1;
 }
 
 .follow-button.not-following {
@@ -24,4 +32,55 @@
 .follow-button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+.follow-button:hover .follow-icon {
+  transform: scale(1.1);
+}
+
+.follow-icon {
+  font-size: 1.2rem;
+  color: #fff;
+  transition: transform 0.2s ease;
+}
+
+@media (max-width: 1041px) {
+  .follow-button {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    border-radius: 16px;
+    min-width: 100px;
+  }
+
+  .follow-text {
+    display: none;
+  }
+
+  .follow-icon {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .follow-button {
+    padding: 8px;
+    border-radius: 12px;
+    min-width: 36px;
+  }
+
+  .follow-icon {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .follow-button {
+    padding: 6px;
+    border-radius: 10px;
+    min-width: 32px;
+  }
+
+  .follow-icon {
+    font-size: 0.9rem;
+  }
 }
