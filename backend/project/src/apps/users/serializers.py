@@ -67,11 +67,16 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
+    message_id = serializers.IntegerField(source='id', read_only=True)
     sender_name = serializers.CharField(source='sender.username', read_only=True)
+    sender_avatar_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Message
-        fields = ['sender_name', 'text', 'sent_at']
+        fields = ['message_id', 'sender_name', 'sender_avatar_url', 'text', 'sent_at', 'is_read']
+
+    def get_sender_avatar_url(self, obj):
+        return obj.sender.avatar.url if obj.sender.avatar else None
 
 
 class ChatSerializer(serializers.ModelSerializer):
