@@ -1,0 +1,113 @@
+.like-list-page {
+  background-color: #f9f9f9;
+  padding: 20px;
+  margin: 40px 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: calc(600px - 30px);
+  max-height: 80vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+  position: relative;
+  left: 0;
+  transform: none;
+  width: calc(100% - 30px);
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+.like-list-page h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+  margin-top: 7px;
+  margin-bottom: 20px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+.like-list {
+  list-style: none;
+  padding: 5px 10px 0;
+  margin: 0;
+  max-height: 70vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.like-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.like-item:hover {
+  transform: scale(1.02);
+}
+
+.like-item .user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100% - 20px);
+  overflow: hidden;
+}
+
+.like-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 5px;
+}
+
+.like-item span {
+  font-family: "Montserrat", sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .like-list-page {
+    width: calc(95% - 30px);
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .like-list-page {
+    padding: 15px;
+    width: calc(100% - 30px);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .like-list-page h2 {
+    font-size: 20px;
+  }
+
+  .like-item .user-info {
+    max-width: calc(100% - 15px);
+  }
+
+  .like-avatar {
+    width: 40px;
+    height: 40px;
+  }
+}
