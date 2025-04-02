@@ -1,13 +1,19 @@
 .follow-list {
   background-color: #f9f9f9;
   padding: 20px;
-  margin-top: 40px;
+  margin: 40px auto;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  max-width: 90%;
-  max-height: 70vh;
+  max-width: 600px;
+  max-height: 80vh;
   overflow-y: auto;
   scrollbar-width: none;
+  position: relative;
+  left: 0;
+  transform: none;
+  width: 95%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .follow-list h2 {
@@ -17,16 +23,29 @@
   text-align: center;
   margin-top: 7px;
   margin-bottom: 20px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
-.follow-list span:first-child {
+.follow-list .user {
   color: #7497fa;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .follow-list ul {
   list-style: none;
-  padding: 0;
+  padding: 0 10px;
   margin: 0;
+  max-height: 70vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.follow-list li:first-child {
+  margin-top: 10px;
 }
 
 .follow-list li {
@@ -39,6 +58,9 @@
   margin-bottom: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .follow-list li:hover {
@@ -49,6 +71,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  max-width: calc(100% - 100px);
+  overflow: hidden;
 }
 
 .follow-list li img {
@@ -57,4 +81,35 @@
   border-radius: 50%;
   object-fit: cover;
   margin-right: 5px;
+}
+
+@media (max-width: 768px) {
+  .follow-list {
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .follow-button {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+
+  .follow-list {
+    padding: 15px;
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .follow-list h2 {
+    font-size: 20px;
+  }
+
+  .follow-list li img {
+    width: 40px;
+    height: 40px;
+  }
 }
