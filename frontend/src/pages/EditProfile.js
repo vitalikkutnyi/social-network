@@ -66,7 +66,6 @@ const EditProfile = () => {
           "Content-Type": "multipart/form-data",
         },
       });
-
       setData({
         username: response.data.username,
         bio: response.data.bio,
