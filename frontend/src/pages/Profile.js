@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import Post from "../components/Post";
 import FollowButton from "../components/FollowButton";
 import CreatePost from "../components/CreatePost";
+import Story from "../components/Story";
+import PageTitle from "../components/PageTitle";
+import { BiMessageSquareEdit } from "react-icons/bi";
+import { TbMessage2Filled } from "react-icons/tb";
+import API from "../API";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
+  const [currentUserProfile, setCurrentUserProfile] = useState(null);
+  const [isCreateStoryModalOpen, setIsCreateStoryModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
@@ -14,112 +20,40 @@ const Profile = () => {
   const { username } = useParams();
 
   const handleEditProfile = () => {
-    navigate(`/profile/edit`);
-  };
-
-  const isTokenExpired = (token) => {
-    if (!token) return true;
-    try {
-      const decoded = JSON.parse(atob(token.split(".")[1]));
-      const exp = decoded.exp * 1000;
-      return Date.now() >= exp;
-    } catch (e) {
-      return true;
-    }
-  };
-
-  const refreshToken = async () => {
-    try {
-      const refresh_token = localStorage.getItem("refresh_token");
-      const response = await axios.post(
-        "http://127.0.0.1:8000/token/refresh/",
-        { refresh_token }
-      );
-      const { access } = response.data;
-      localStorage.setItem("access_token", access);
-      return access;
-    } catch (err) {
-      setError("Не вдалося оновити токен. Увійдіть знову.");
-      navigate("/login");
-      return null;
-    }
+    navigate(`/profile/edit/`);
   };
 
   const fetchUserProfile = async () => {
-    let token = localStorage.getItem("access_token");
-    if (!token) {
-      setError("Токен відсутній, будь ласка, увійдіть.");
-      navigate("/login");
-      return;
-    }
-
-    if (isTokenExpired(token)) {
-      token = await refreshToken();
-      if (!token) return;
-      localStorage.setItem("access_token", token);
-    }
-
     try {
-      const url = username
-        ? `http://127.0.0.1:8000/profile/${username}/`
-        : "http://127.0.0.1:8000/profile/";
-      const response = await axios.get(url, {
-        headers: { Authorization: `Bearer ${token}` },
+      const url = username ? `/profile/${username}/` : "/profile/";
+      const response = await API.get(url, { withCredentials: true });
+      const sortedPosts = [...response.data.posts].sort((a, b) => {
+        if (a.is_pinned === b.is_pinned) {
+          return new Date(b.created_at) - new Date(a.created_at);
+        }
+        return b.is_pinned - a.is_pinned;
       });
-      const sortedPosts = response.data.posts.sort(
-        (a, b) => new Date(b.created_at) - new Date(a.created_at)
-      );
       setUser({ ...response.data, posts: sortedPosts });
-      if (!username) {
-        localStorage.setItem("username", response.data.username);
+
+      if (!currentUserProfile) {
+        const currentUserResponse = await API.get("/profile/", {
+          withCredentials: true,
+        });
+        setCurrentUserProfile({
+          ...currentUserResponse.data,
+          posts: currentUserResponse.data.posts.sort((a, b) => {
+            if (a.is_pinned === b.is_pinned) {
+              return new Date(b.created_at) - new Date(a.created_at);
+            }
+            return b.is_pinned - a.is_pinned;
+          }),
+        });
+        localStorage.setItem("username", currentUserResponse.data.username);
       }
     } catch (error) {
-      if (error.response?.status === 401) {
-        const newToken = await refreshToken();
-        if (newToken) {
-          try {
-            const url = username
-              ? `http://127.0.0.1:8000/profile/${username}/`
-              : "http://127.0.0.1:8000/profile/";
-            const retryResponse = await axios.get(url, {
-              headers: { Authorization: `Bearer ${newToken}` },
-            });
-            const sortedPosts = retryResponse.data.posts.sort(
-              (a, b) => new Date(b.created_at) - new Date(a.created_at)
-            );
-            setUser({ ...retryResponse.data, posts: sortedPosts });
-          } catch (retryError) {
-            setError("Помилка після оновлення токена.");
-            navigate("/login");
-          }
-        }
-      } else {
-        setError(`Помилка: ${error.response?.data?.detail || error.message}`);
-      }
+      setError(`Помилка: ${error.response?.data?.detail || error.message}`);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      const response = await axios.post("http://localhost:8000/logout/", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-      });
-
-      if (response.status === 200) {
-        navigate("/login");
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
-        setMessage((message = response.data.message));
-        setError("");
-      }
-    } catch (error) {
-      console.error("Помилка при виході:", error);
-      setError("Сталася помилка при виході з акаунта");
-      setMessage("");
     }
   };
 
@@ -131,10 +65,97 @@ const Profile = () => {
   };
 
   const handlePostCreated = (newPost) => {
+    setUser((prevUser) => {
+      const updatedPosts = [newPost, ...prevUser.posts];
+      const sortedPosts = updatedPosts.sort((a, b) => {
+        if (a.is_pinned === b.is_pinned) {
+          return new Date(b.created_at) - new Date(a.created_at);
+        }
+        return b.is_pinned - a.is_pinned;
+      });
+      return { ...prevUser, posts: sortedPosts };
+    });
+  };
+
+  const handlePinToggle = (postId, isPinned) => {
+    setUser((prevUser) => {
+      const updatedPosts = prevUser.posts.map((post) =>
+        post.id === postId ? { ...post, is_pinned: isPinned } : { ...post }
+      );
+      const sortedPosts = [...updatedPosts].sort((a, b) => {
+        if (a.is_pinned === b.is_pinned) {
+          return new Date(b.created_at) - new Date(a.created_at);
+        }
+        return b.is_pinned - a.is_pinned;
+      });
+      return { ...prevUser, posts: sortedPosts };
+    });
+  };
+
+  const handleRepost = (postId, repostData) => {
+    setUser((prevUser) => {
+      const updatedPosts = prevUser.posts.map((post) =>
+        post.id === postId
+          ? { ...post, reposts_count: repostData.reposts_count }
+          : post
+      );
+      return { ...prevUser, posts: updatedPosts };
+    });
+
+    setCurrentUserProfile((prevProfile) => {
+      const newRepost = {
+        ...repostData,
+        is_repost: true,
+        repost_date: new Date().toISOString(),
+      };
+      const finalPosts = [newRepost, ...prevProfile.posts].sort((a, b) => {
+        if (a.is_pinned !== b.is_pinned) {
+          return b.is_pinned - a.is_pinned;
+        }
+        const dateA = a.repost_date || a.created_at;
+        const dateB = b.repost_date || b.created_at;
+        return new Date(dateB) - new Date(dateA);
+      });
+      return { ...prevProfile, posts: finalPosts };
+    });
+  };
+
+  const handleMessageUser = async () => {
+    try {
+      const chatsResponse = await API.get("/chats/");
+      const existingChat = chatsResponse.data.find(
+        (chat) => chat.other_user === username
+      );
+
+      if (existingChat) {
+        navigate(`/chats/${existingChat.id}/messages/`);
+        return;
+      }
+
+      const createResponse = await API.post("/chats/create/", {
+        user2: username,
+      });
+      const chatId = createResponse.data.id;
+      navigate(`/chats/${chatId}/messages/`);
+    } catch (error) {
+      setError(
+        error.response?.data?.error ||
+          error.response?.data?.message ||
+          "Не вдалося відкрити чат."
+      );
+      console.error(
+        "Chat error:",
+        error.response?.status,
+        error.response?.data
+      );
+    }
+  };
+
+  const handleStoryCreated = (newStory) => {
     setUser((prevUser) => ({
       ...prevUser,
-      posts: [newPost, ...prevUser.posts],
     }));
+    setIsCreateStoryModalOpen(false);
   };
 
   useEffect(() => {
@@ -166,6 +187,7 @@ const Profile = () => {
 
   return (
     <div className="profile-container">
+      <PageTitle />
       {isOwnProfile && (
         <CreatePost
           username={user.username}
@@ -173,19 +195,17 @@ const Profile = () => {
         />
       )}
       <div className="profile-header">
-        <div>
-          {user.avatar_url ? (
-            <img
-              src={`http://127.0.0.1:8000${user.avatar_url}`}
-              alt="Аватар"
-              className="profile-avatar"
-            />
-          ) : (
-            <img
-              src={"http://127.0.0.1:8000/media/avatars/avatar.jpg"}
-              className="profile-avatar"
-            />
-          )}
+        <div className="profile-header-left">
+          <Story
+            username={user.username}
+            avatarUrl={
+              user.avatar_url
+                ? `http://127.0.0.1:8000${user.avatar_url}`
+                : "http://127.0.0.1:8000/media/avatars/avatar.jpg"
+            }
+            isOwnProfile={isOwnProfile}
+            viewerId={currentUserProfile?.id}
+          />
           <h2>{user.username}</h2>
         </div>
         <div className="profile-header-buttons">
@@ -195,18 +215,25 @@ const Profile = () => {
                 onClick={handleEditProfile}
                 className="profile-header-button"
               >
-                Редагувати профіль
-              </button>
-              <button onClick={handleLogout} className="profile-header-button">
-                Вихід
+                <BiMessageSquareEdit className="edit-icon" />
+                <span className="button-text">Редагувати профіль</span>
               </button>
             </>
           ) : (
-            <FollowButton
-              username={username}
-              initialFollowing={user.is_following}
-              setUser={setUser}
-            />
+            <>
+              <button
+                onClick={handleMessageUser}
+                className="profile-header-button profile-header-button--message"
+              >
+                <TbMessage2Filled className="message-icon" />
+                <span className="button-text">Повідомлення</span>
+              </button>
+              <FollowButton
+                username={username}
+                initialFollowing={user.is_following}
+                setUser={setUser}
+              />
+            </>
           )}
         </div>
       </div>
@@ -214,10 +241,10 @@ const Profile = () => {
       <div className="profile-stats">
         <div className="profile-stats-left">
           <p onClick={() => navigate(`/profile/${user.username}/followers/`)}>
-            Підписники: {user.followers_count}
+            Слідкувачі: {user.followers_count}
           </p>
           <p onClick={() => navigate(`/profile/${user.username}/following/`)}>
-            Підписки: {user.following_count}
+            Слідкування: {user.following_count}
           </p>
         </div>
         <p>
@@ -227,7 +254,7 @@ const Profile = () => {
       <div className="profile-posts">
         <h3>Дописи</h3>
         {user.posts && user.posts.length > 0 ? (
-          <div>
+          <div className="profile-posts-list">
             {user.posts.map((post) => (
               <Post
                 key={post.id}
@@ -235,6 +262,8 @@ const Profile = () => {
                 username={user.username}
                 onDelete={handlePostDelete}
                 onCommentAdded={() => handleCommentAdded(post.id)}
+                onPinToggle={handlePinToggle}
+                onRepost={handleRepost}
               />
             ))}
           </div>
@@ -242,6 +271,12 @@ const Profile = () => {
           <p>Немає дописів.</p>
         )}
       </div>
+      {isCreateStoryModalOpen && (
+        <Story.CreateStoryModal
+          onClose={() => setIsCreateStoryModalOpen(false)}
+          onStoryCreated={handleStoryCreated}
+        />
+      )}
     </div>
   );
 };
