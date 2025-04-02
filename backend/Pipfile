@@ -8,6 +8,10 @@ django = "*"
 psycopg2-binary = "*"
 django-restframework = "*"
 rest-framework-simplejwt = "*"
+django-otp = "*"
+qrcode = "*"
+pillow = "*"
+google-generativeai = "*"
 
 [dev-packages]
 
