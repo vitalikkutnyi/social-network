@@ -1,13 +1,16 @@
 .post-detail-container {
   display: flex;
   flex-direction: column;
-  width: clamp(620px, 90%, 700px);
-  max-height: 100vh;
+  align-items: center;
+  width: 100%;
+  max-width: 680px;
   margin: 20px auto 0;
+  padding: 0 10px;
   font-family: "Montserrat", sans-serif;
-  box-sizing: border-box;
+  max-height: calc(100vh - 20px);
   overflow-y: auto;
   scrollbar-width: none;
+  box-sizing: border-box;
 }
 
 .post-detail-container-button {
@@ -23,7 +26,10 @@
   width: 90%;
   max-width: none;
   box-sizing: border-box;
-  margin: 0 auto;
+  margin-bottom: 20px;
+  white-space: normal;
+  word-break: break-word;
+  text-align: center;
 }
 
 .post-detail-container-button:hover {
@@ -39,4 +45,17 @@
 .post-detail-container-button:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(108, 117, 125, 0.5);
+}
+
+@media (max-width: 768px) {
+  .post-detail-container {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .post-detail-container-button {
+    font-size: 14px;
+    padding: 10px 20px;
+  }
 }
