@@ -24,7 +24,6 @@ function Login() {
           "Content-Type": "application/json",
         },
       });
-
       if (response.data.message) {
         setMessage(response.data.message);
         setError("");
