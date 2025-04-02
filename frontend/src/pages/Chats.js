@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaTrash } from "react-icons/fa";
+import { TbPointFilled } from "react-icons/tb";
+import API from "../API";
 
 const Chats = () => {
   const [chats, setChats] = useState([]);
@@ -16,27 +17,22 @@ const Chats = () => {
   useEffect(() => {
     const fetchChats = async () => {
       try {
-        const token = localStorage.getItem("access_token");
-        if (!token) {
-          setError("Увійдіть у систему.");
-          navigate("/login");
-          return;
-        }
-
-        const userResponse = await axios.get("http://127.0.0.1:8000/profile/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const userResponse = await API.get("/profile/");
         setCurrentUser(userResponse.data.username);
 
-        const response = await axios.get("http://127.0.0.1:8000/chats/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const response = await API.get("/chats/");
+
+        const sortedChats = response.data.sort((a, b) => {
+          const aTime = a.last_message
+            ? new Date(a.last_message.sent_at)
+            : new Date(a.created_at);
+          const bTime = b.last_message
+            ? new Date(b.last_message.sent_at)
+            : new Date(b.created_at);
+          return bTime - aTime;
         });
 
-        setChats(response.data);
+        setChats(sortedChats);
       } catch (err) {
         setError(err.response?.data?.detail || "Не вдалося завантажити чати.");
       } finally {
@@ -54,13 +50,7 @@ const Chats = () => {
     }
 
     try {
-      const token = localStorage.getItem("access_token");
-      const response = await axios.get(
-        `http://127.0.0.1:8000/search/?q=${query}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await API.get(`/users/search/?q=${query}`);
       setSearchResults(response.data);
     } catch (err) {
       setError("Не вдалося знайти користувачів.");
@@ -83,20 +73,23 @@ const Chats = () => {
     }
 
     try {
-      const token = localStorage.getItem("access_token");
-      const response = await axios.post(
-        "http://127.0.0.1:8000/chats/create/",
-        {
-          user2: selectedUsername,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await API.post("/chats/create/", {
+        user2: selectedUsername,
+      });
 
-      setChats((prevChats) => [...prevChats, response.data]);
+      setChats((prevChats) => {
+        const updatedChats = [...prevChats, response.data];
+        return updatedChats.sort((a, b) => {
+          const aTime = a.last_message
+            ? new Date(a.last_message.sent_at)
+            : new Date(a.created_at);
+          const bTime = b.last_message
+            ? new Date(b.last_message.sent_at)
+            : new Date(b.created_at);
+          return bTime - aTime;
+        });
+      });
+
       setNewChatUsername("");
       setSearchResults([]);
       setIsModalOpen(false);
@@ -112,12 +105,7 @@ const Chats = () => {
 
   const handleDeleteChat = async (chatId) => {
     try {
-      const token = localStorage.getItem("access_token");
-      await axios.delete(`http://127.0.0.1:8000/chats/${chatId}/delete/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await API.delete(`/chats/${chatId}/delete/`);
 
       setChats((prevChats) => prevChats.filter((chat) => chat.id !== chatId));
       setError(null);
@@ -126,11 +114,38 @@ const Chats = () => {
     }
   };
 
-  {
-    /* const handleChatClick = (chatId) => {
-        navigate(`/chats/${chatId}`);
-    } */
-  }
+  const handleChatClick = (chatId) => {
+    navigate(`/chats/${chatId}/messages/`);
+  };
+
+  const formatDateTime = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+
+    const isToday =
+      date.getDate() === now.getDate() &&
+      date.getMonth() === now.getMonth() &&
+      date.getFullYear() === now.getFullYear();
+
+    const timeOptions = {
+      hour: "2-digit",
+      minute: "2-digit",
+    };
+    const time = new Intl.DateTimeFormat("uk-UA", timeOptions).format(date);
+
+    if (isToday) {
+      return time;
+    } else {
+      const dateOptions = {
+        day: "numeric",
+        month: "short",
+      };
+      const datePart = new Intl.DateTimeFormat("uk-UA", dateOptions).format(
+        date
+      );
+      return `${datePart} • ${time}`;
+    }
+  };
 
   if (loading) return <p>Завантаження...</p>;
   if (error) return <p>{error}</p>;
@@ -197,63 +212,78 @@ const Chats = () => {
         <p className="no-chats-message">У вас немає активних чатів.</p>
       ) : (
         <ul className="chat-list">
-          {chats.map((chat) => (
-            <li
-              key={chat.id}
-              /* onClick={() => handleChatClick(chats.id)} */
-              className="chat-item"
-            >
-              <div className="chat-info">
-                <div className="chat-info-header">
-                  <div className="chat-info-header-left">
-                    {chat.avatar_url ? (
-                      <img
-                        src={`http://127.0.0.1:8000${chat.avatar_url}`}
-                        alt="Аватар"
-                        className="chat-info-avatar"
-                      />
-                    ) : (
-                      <img
-                        src={"http://127.0.0.1:8000/media/avatars/avatar.jpg"}
-                        alt="Аватар за замовчуванням"
-                        className="chat-info-avatar"
-                      />
-                    )}
-                    <strong>{chat.other_user}</strong>
+          {chats.map((chat) => {
+            const isLastMessageUnread =
+              chat.last_message &&
+              chat.last_message.sender_name !== currentUser &&
+              !chat.last_message.is_read;
+
+            return (
+              <li
+                key={chat.id}
+                onClick={() => handleChatClick(chat.id)}
+                className="chat-item"
+              >
+                <div className="chat-info">
+                  <div className="chat-info-header">
+                    <div className="chat-info-header-left">
+                      {chat.avatar_url ? (
+                        <img
+                          src={`http://127.0.0.1:8000${chat.avatar_url}`}
+                          alt="Аватар"
+                          className="chat-info-avatar"
+                        />
+                      ) : (
+                        <img
+                          src={"http://127.0.0.1:8000/media/avatars/avatar.jpg"}
+                          alt="Аватар за замовчуванням"
+                          className="chat-info-avatar"
+                        />
+                      )}
+                      <strong>{chat.other_user}</strong>
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteChat(chat.id);
+                      }}
+                      className="delete-chat-button"
+                    >
+                      <FaTrash />
+                    </button>
                   </div>
-                  <button
-                    onClick={() => handleDeleteChat(chat.id)}
-                    className="delete-chat-button"
-                  >
-                    <FaTrash />
-                  </button>
+                  {chat.last_message ? (
+                    <p>
+                      <span
+                        className={`text ${
+                          isLastMessageUnread ? "unread-text" : ""
+                        }`}
+                      >
+                        {chat.last_message.sender_name === currentUser
+                          ? `Ви: ${chat.last_message.text}`
+                          : `${chat.last_message.sender_name}: ${chat.last_message.text}`}
+                      </span>
+                      <span className="unread">
+                        {isLastMessageUnread ? <TbPointFilled /> : ""}
+                      </span>
+                      <span className="meta">
+                        <small>
+                          {formatDateTime(chat.last_message.sent_at)}
+                        </small>
+                      </span>
+                    </p>
+                  ) : (
+                    <p>
+                      <span className="text">Немає повідомлень.</span>
+                      <span className="meta">
+                        <small>{formatDateTime(chat.created_at)}</small>
+                      </span>
+                    </p>
+                  )}
                 </div>
-                {chat.last_message ? (
-                  <p>
-                    {chat.last_message.sender_name === currentUser
-                      ? `Ви: ${chat.last_message.text}`
-                      : `${chat.last_message.sender_name}: ${chat.last_message.text}`}
-                    <small>
-                      {new Intl.DateTimeFormat("uk-UA", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      }).format(new Date(chat.last_message.sent_at))}
-                    </small>
-                  </p>
-                ) : (
-                  <p>
-                    Немає повідомлень.
-                    <small>
-                      {new Intl.DateTimeFormat("uk-UA", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      }).format(new Date(chat.created_at))}
-                    </small>
-                  </p>
-                )}
-              </div>
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
