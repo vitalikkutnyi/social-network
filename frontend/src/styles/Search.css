@@ -1,14 +1,23 @@
 .search-container {
   position: relative;
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
   margin: 40px auto 20px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  height: calc(100vh - 60px);
+  overflow: hidden;
 }
 
 .search {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
+  padding: 5px 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .search-input {
@@ -21,6 +30,12 @@
   box-sizing: border-box;
   outline: none;
   transition: border-color 0.3s ease;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .search-input:focus {
@@ -37,6 +52,10 @@
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  white-space: normal;
+  min-width: 0;
+  width: auto;
+  max-width: 100%;
 }
 
 .search-button:hover {
@@ -55,6 +74,7 @@
   font-size: 14px;
   margin: 5px 0;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .search-loading {
@@ -66,26 +86,22 @@
 }
 
 .search-no-results {
-  margin: 20px;
+  margin: 20px 0;
   color: #555;
+  word-break: break-word;
 }
 
 .search-results {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
   background: #fff;
   border: 1px solid #ccc;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   list-style: none;
-  padding: 0;
-  margin: 5px 0 0 0;
-  max-height: 200px;
+  padding: 10px;
+  margin: 10px 0;
+  max-height: 25vh;
   overflow-y: auto;
   scrollbar-width: none;
-  z-index: 10;
 }
 
 .search-result-item {
@@ -112,4 +128,98 @@
   font-family: "Montserrat", sans-serif;
   font-size: 16px;
   color: #333;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+.search-section {
+  margin: 20px 0;
+  flex-shrink: 0;
+}
+
+.search-section h3 {
+  font-family: "Montserrat", sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.search-posts {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 10px;
+  padding: 10px;
+  max-height: 40vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.search-posts .post-container {
+  margin: 5px 0;
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .search-container {
+    max-width: 100%;
+  }
+
+  .search-results {
+    max-height: 25vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .search {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-input {
+    font-size: 14px;
+    padding: 8px 12px;
+    width: 100%;
+  }
+
+  .search-button {
+    font-size: 14px;
+    padding: 8px 15px;
+  }
+
+  .search-results {
+    max-height: 25vh;
+  }
+
+  .search-avatar {
+    width: 35px;
+    height: 35px;
+  }
+
+  .search-result-item span {
+    font-size: 14px;
+  }
+
+  .search-section h3 {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 320px) {
+  .search-input {
+    font-size: 12px;
+    padding: 6px 10px;
+    word-break: break-word; /* Текст в інпуті переноситься */
+  }
+
+  .search-button {
+    font-size: 12px;
+    padding: 6px 10px;
+    white-space: normal;
+    word-break: break-word;
+  }
 }
