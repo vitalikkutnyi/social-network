@@ -1,8 +1,9 @@
 .profile-container {
   display: flex;
   flex-direction: column;
-  width: clamp(620px, 90%, 700px);
-  max-height: 100vh;
+  width: 100%;
+  max-width: clamp(620px, 90%, 700px);
+  height: calc(100vh - 60px);
   margin: 20px auto 0;
   padding: 20px;
   font-family: "Montserrat", sans-serif;
@@ -15,68 +16,103 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: nowrap;
+  gap: 10px;
 }
 
 .profile-header > div:first-child {
   display: flex;
   align-items: center;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .profile-header h2 {
-  margin-left: 15px;
+  margin-left: 23px;
   font-size: 2rem;
   color: #333;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%;
-}
-
-.profile-avatar {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 4px solid #ddd;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 150px;
+  white-space: normal;
 }
 
 .profile-header-buttons {
   display: flex;
   gap: 10px;
-  margin-left: 10px;
+  flex-wrap: nowrap;
+  min-width: 0;
+  flex-shrink: 0;
 }
 
 .profile-header-button {
-  padding: 12px 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 20px;
   font-size: 1rem;
   color: #fff;
-  background-color: #000000;
+  background-color: #000;
   border: none;
   border-radius: 16px;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
   font-family: "Montserrat", sans-serif;
+  min-width: 120px;
+  box-sizing: border-box;
+  white-space: nowrap;
+  flex-shrink: 1;
 }
 
-.profile-header-button:hover {
-  transform: scale(1.05);
+.profile-header-button--message {
+  background-color: #b9b9b9;
 }
 
-.profile-header-button:active {
+.profile-header-button:hover,
+.profile-header-button--message:hover {
+  transform: scale(1.03);
+}
+
+.profile-header-button:active,
+.profile-header-button--message:active {
   transform: scale(1);
+}
+
+.message-icon,
+.edit-icon {
+  font-size: 1.2rem;
+  color: #fff;
+  transition: transform 0.2s ease;
+}
+
+.profile-header-button:hover .message-icon,
+.profile-header-button:hover .edit-icon {
+  transform: scale(1.1);
 }
 
 .profile-bio {
   font-size: 1.1rem;
   margin: 30px 0 20px;
   color: #555;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
 }
 
 .profile-stats {
   display: flex;
   justify-content: space-between;
   font-size: 1.1rem;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .profile-stats-left {
@@ -84,24 +120,41 @@
   gap: 15px;
   margin-right: 15px;
   cursor: pointer;
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .profile-stats p {
   margin-top: 0;
   color: #777;
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .profile-posts {
   margin-top: 30px;
+  flex-grow: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
 }
 
 .profile-posts h3 {
   font-size: 1.5rem;
   color: #333;
   margin: 0;
+  flex-shrink: 0;
 }
 
-.post-container {
+.profile-posts-list {
+  padding: 0 10px;
+}
+
+.profile-posts .post-container {
   width: 100%;
   max-width: 100%;
   margin-bottom: 20px;
@@ -158,11 +211,14 @@
   color: #888;
   padding-top: 10px;
   border-top: 1px solid #eee;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .post-meta-left {
   display: flex;
   gap: 20px;
+  flex-wrap: wrap;
 }
 
 .post-meta-left span {
@@ -228,4 +284,253 @@
   font-size: 0.85rem;
   display: block;
   margin-top: 5px;
+}
+
+@media (max-width: 1041px) {
+  .profile-header-buttons {
+    margin-top: 0;
+    margin-left: 0;
+    width: auto;
+    justify-content: flex-end;
+  }
+
+  .profile-header-button {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    border-radius: 16px;
+    min-width: 100px;
+  }
+
+  .button-text {
+    display: none;
+  }
+
+  .message-icon,
+  .edit-icon {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 853px) {
+  .profile-container {
+    width: 95%;
+    max-width: 100%;
+    margin: 20px auto 0;
+    padding: 15px;
+  }
+
+  .profile-header h2 {
+    font-size: 1.8rem;
+    max-width: 130px;
+  }
+}
+
+@media (max-width: 600px) {
+  .profile-container {
+    width: 100%;
+    max-width: calc(100% - 30px);
+    height: calc(100vh - 50px);
+    padding: 15px;
+  }
+
+  .profile-header {
+    gap: 8px;
+    align-items: center;
+  }
+
+  .profile-header h2 {
+    font-size: 1.5rem;
+    max-width: 120px;
+    margin-left: 23px;
+  }
+
+  .profile-header-buttons {
+    margin-top: 0;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .profile-header-button {
+    padding: 10px;
+    border-radius: 14px;
+  }
+
+  .message-icon,
+  .edit-icon {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-container {
+    max-width: calc(100% - 20px);
+    padding: 10px;
+  }
+
+  .profile-header {
+    gap: 8px;
+    align-items: center;
+  }
+
+  .profile-header h2 {
+    font-size: 1.2rem;
+    margin-left: 15px;
+    max-width: 100px;
+  }
+
+  .profile-header-buttons {
+    margin-top: 0;
+    margin-left: 0;
+    gap: 6px;
+    width: auto;
+    justify-content: flex-end;
+  }
+
+  .profile-header-button {
+    padding: 8px;
+    border-radius: 12px;
+  }
+
+  .message-icon,
+  .edit-icon {
+    font-size: 1rem;
+  }
+
+  .profile-bio {
+    font-size: 0.9rem;
+    margin: 20px 0 15px;
+  }
+
+  .profile-stats {
+    font-size: 0.9rem;
+    gap: 8px;
+  }
+
+  .profile-stats-left {
+    gap: 10px;
+    margin-right: 10px;
+  }
+
+  .profile-posts {
+    margin-top: 20px;
+  }
+
+  .profile-posts h3 {
+    font-size: 1.2rem;
+  }
+
+  .post-container {
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+  }
+
+  .post-text {
+    font-size: 1rem;
+  }
+
+  .post-meta {
+    font-size: 0.9rem;
+    gap: 8px;
+  }
+
+  .post-meta-left {
+    gap: 15px;
+  }
+
+  .post-meta-left span svg {
+    font-size: 1rem;
+  }
+
+  .post-comments h4 {
+    font-size: 1.1rem;
+  }
+
+  .comment {
+    padding: 8px;
+    margin-bottom: 10px;
+  }
+
+  .comment p {
+    font-size: 0.9rem;
+  }
+
+  .comment small {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .profile-header-button {
+    padding: 6px;
+    border-radius: 10px;
+    min-width: 60px;
+  }
+}
+
+@media (max-width: 320px) {
+  .profile-container {
+    max-width: calc(100% - 16px);
+    padding: 8px;
+  }
+
+  .profile-header {
+    gap: 8px;
+    align-items: center;
+  }
+
+  .profile-header h2 {
+    font-size: 1rem;
+    margin-left: 10px;
+    max-width: 80px;
+  }
+
+  .profile-header-buttons {
+    margin-top: 0;
+    margin-left: 0;
+    gap: 6px;
+    width: auto;
+    justify-content: flex-end;
+  }
+
+  .profile-header-button {
+    padding: 6px;
+    border-radius: 10px;
+    min-width: 36px;
+  }
+
+  .message-icon,
+  .edit-icon {
+    font-size: 0.9rem;
+  }
+
+  .profile-bio {
+    font-size: 0.85rem;
+    margin: 15px 0 10px;
+  }
+
+  .profile-stats {
+    font-size: 0.85rem;
+  }
+
+  .profile-posts h3 {
+    font-size: 1rem;
+  }
+
+  .post-container {
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  .post-text {
+    font-size: 0.9rem;
+  }
+
+  .post-meta {
+    font-size: 0.8rem;
+  }
+
+  .post-comments h4 {
+    font-size: 1rem;
+  }
 }
