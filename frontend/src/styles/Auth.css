@@ -1,19 +1,20 @@
 .register-form {
-  min-width: 400px;
-  max-width: 600px;
+  min-width: 320px;
+  max-width: 450px;
+  width: 80%;
   padding: 30px;
   border-radius: 19px;
   background: linear-gradient(145deg, #6c7ae0, #4b5cb5);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  position: relative;
+  position: fixed;
   color: white;
   box-sizing: border-box;
   overflow: hidden;
-  position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   margin: 0;
+  z-index: 500;
 }
 
 .register-form::before {
@@ -36,6 +37,9 @@
   font-weight: 700;
   margin-bottom: 20px;
   position: relative;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .register-form form {
@@ -58,10 +62,16 @@
   color: #333;
   transition: all 0.3s ease;
   box-sizing: border-box;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .register-form input::placeholder {
-  color: #bbb;
+  color: #999;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .register-form input:focus {
@@ -81,11 +91,17 @@
   font-size: 16px;
   font-weight: 600;
   transition: background-color 0.3s ease;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .register-form button:last-child {
   margin-top: 15px;
   margin-bottom: 20px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .register-form button:hover {
@@ -95,6 +111,9 @@
 .register-form p {
   margin-top: 25px;
   margin-bottom: 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .error {
@@ -124,8 +143,10 @@
 }
 
 .error {
-  background-color: rgba(255, 0, 0, 0.8);
-  color: white;
+  background-color: rgb(255, 0, 0) !important;
+  color: #f4f4f9 !important;
+  font-size: 18px;
+  z-index: 1000;
 }
 
 @keyframes rotating {
@@ -134,5 +155,156 @@
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+
+.auth-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.auth-modal-content {
+  min-width: 320px;
+  max-width: 600px;
+  width: 90%;
+  padding: 30px;
+  border-radius: 19px;
+  background: linear-gradient(145deg, #6c7ae0, #4b5cb5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  color: white;
+  text-align: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-sizing: border-box;
+  z-index: 1000;
+  margin: 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+.auth-modal-content h2 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.auth-modal-content p {
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.auth-modal-content img {
+  max-width: 80%;
+  margin-bottom: 20px;
+  border-radius: 8px;
+}
+
+.auth-modal-content button {
+  font-family: "Montserrat", sans-serif;
+  padding: 14px 0;
+  background-color: #4b5cb5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  width: 100%;
+}
+
+.auth-modal-content button:hover {
+  background-color: #6c7ae0;
+}
+
+.code {
+  margin-top: 10px;
+}
+
+@media (max-width: 480px) {
+  .register-form {
+    min-width: 280px;
+    padding: 20px;
+  }
+
+  .register-form h1 {
+    font-size: 24px;
+  }
+
+  .register-form input {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .register-form button {
+    font-size: 14px;
+    padding: 12px 0;
+  }
+
+  .auth-modal-content {
+    min-width: 280px;
+    padding: 20px;
+  }
+
+  .auth-modal-content h2 {
+    font-size: 24px;
+  }
+
+  .auth-modal-content p {
+    font-size: 14px;
+  }
+
+  .auth-modal-content button {
+    font-size: 14px;
+    padding: 12px 0;
+  }
+}
+
+@media (max-width: 320px) {
+  .register-form {
+    min-width: 100%;
+    padding: 15px;
+    border-radius: 0;
+  }
+
+  .auth-modal-content {
+    min-width: 100%;
+    padding: 15px;
+    border-radius: 0;
+  }
+}
+
+@media (max-width: 1024px) and (max-height: 600px) {
+  .register-form,
+  .auth-modal-content {
+    max-width: 400px;
+    width: 75%;
+    padding: 20px;
+  }
+
+  .register-form h1,
+  .auth-modal-content h2 {
+    font-size: 24px;
+  }
+
+  .register-form input,
+  .auth-modal-content p {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .register-form button,
+  .auth-modal-content button {
+    font-size: 14px;
+    padding: 12px 0;
   }
 }
