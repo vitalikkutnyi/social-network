@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import Post from "../components/Post.js";
+import API from "../API";
 
 const PostDetailPage = () => {
   const { username, pk } = useParams();
@@ -13,21 +13,7 @@ const PostDetailPage = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const token = localStorage.getItem("access_token");
-        if (!token) {
-          setError("Увійдіть у систему.");
-          setLoading(false);
-          return;
-        }
-
-        const response = await axios.get(
-          `http://127.0.0.1:8000/profile/${username}/posts/${pk}/`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await API.get(`/profile/${username}/posts/${pk}/`);
         setPost(response.data);
       } catch (err) {
         setError(err.response?.data?.error || "Не вдалося завантажити допис.");
