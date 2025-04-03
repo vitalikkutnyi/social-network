@@ -72,11 +72,7 @@ const FollowButton = ({ username, initialFollowing, setUser, icon: Icon }) => {
       >
         <FollowIcon className="follow-icon" />
         <span className="follow-text">
-          {loading
-            ? "Завантаження..."
-            : isFollowing
-            ? "Відписатися"
-            : "Підписатися"}
+          {loading ? "Завантаження..." : isFollowing ? "Не стежити" : "Стежити"}
         </span>
       </button>
     </div>
