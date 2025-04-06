@@ -12,7 +12,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
 
 
@@ -24,14 +27,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-4+-1t8@fy_uxjr-w*%e$un6qrk3pdf)l+li*@laj2ibf7)s@1_'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
-GEMINI_API_KEY = ("AIzaSyAuItKCHrncvknpmK26Vz5st1w1o9Ra_Uo")
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False 
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['lynquora.me', '138.68.83.127']
 
 # Application definition
 
@@ -92,11 +95,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'social_network',
-        'USER': 'vtlkktn',
-        'PASSWORD': 'root',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': 'localhost',
-        'PORT': '5432',
+        'PORT': '5433',
     }
 }
 
@@ -136,6 +139,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'static'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -179,7 +183,17 @@ SIMPLE_JWT = {
 
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    "http://lynquora.me",
+    "https://lynquora.me"
 ]
+
 CORS_ALLOW_CREDENTIALS = True
 CORS_EXPOSE_HEADERS = ['Content-Type', 'Authorization']  
+
+
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True  
+CSRF_COOKIE_SECURE = True  
+SECURE_HSTS_SECONDS = 31536000  
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
