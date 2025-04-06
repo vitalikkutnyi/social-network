@@ -4,14 +4,18 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "*"
+django-cors-headers = "*"
 psycopg2-binary = "*"
-django-restframework = "*"
-rest-framework-simplejwt = "*"
+django = "*"
+django-cleanup = "*"
 django-otp = "*"
 qrcode = "*"
 pillow = "*"
 google-generativeai = "*"
+djangorestframework = "*"
+rest-framework-simplejwt = "*"
+djangorestframework-simplejwt = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
