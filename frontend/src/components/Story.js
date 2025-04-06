@@ -35,12 +35,6 @@ const Story = ({ username, avatarUrl, isOwnProfile, viewerId }) => {
       return;
     }
     try {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        console.error("Токен відсутній!");
-        setViewedStories(new Set());
-        return;
-      }
       const response = await API.get(
         `/viewed-stories/?viewer_id=${effectiveViewerId}&username=${username}`
       );
