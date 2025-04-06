@@ -14,7 +14,7 @@ const EditProfile = () => {
   const navigate = useNavigate();
 
   const goToProfile = () => {
-    navigate("/profile");
+    navigate("/profile/");
   };
 
   useEffect(() => {
