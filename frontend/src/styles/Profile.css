@@ -28,7 +28,7 @@
 }
 
 .profile-header h2 {
-  margin-left: 23px;
+  margin-left: 25px;
   font-size: 2rem;
   color: #333;
   overflow-wrap: break-word;
@@ -341,7 +341,7 @@
   .profile-header h2 {
     font-size: 1.5rem;
     max-width: 120px;
-    margin-left: 23px;
+    margin-left: 21px;
   }
 
   .profile-header-buttons {
@@ -353,6 +353,7 @@
   .profile-header-button {
     padding: 10px;
     border-radius: 14px;
+    min-width: 50px;
   }
 
   .message-icon,
@@ -389,6 +390,7 @@
   .profile-header-button {
     padding: 8px;
     border-radius: 12px;
+    min-width: 36px;
   }
 
   .message-icon,
@@ -460,14 +462,6 @@
   }
 }
 
-@media (max-width: 400px) {
-  .profile-header-button {
-    padding: 6px;
-    border-radius: 10px;
-    min-width: 60px;
-  }
-}
-
 @media (max-width: 320px) {
   .profile-container {
     max-width: calc(100% - 16px);
@@ -496,7 +490,7 @@
   .profile-header-button {
     padding: 6px;
     border-radius: 10px;
-    min-width: 36px;
+    min-width: 32px;
   }
 
   .message-icon,
