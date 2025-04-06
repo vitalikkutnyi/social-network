@@ -94,7 +94,7 @@ def register_view(request):
                 device.save()
 
             secret_base32 = base64.b32encode(device.bin_key).decode('utf-8').replace('=', '')
-            issuer = "lynquora.com"
+            issuer = "lynquora.me"
             otpauth_url = f"otpauth://totp/{username}?secret={secret_base32}&issuer={issuer}"
             qr = qrcode.make(otpauth_url)
             buffered = BytesIO()
