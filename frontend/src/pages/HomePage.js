@@ -68,7 +68,7 @@ const HomePage = () => {
     <div className="homepage-container">
       <h2>Головна сторінка</h2>
       {posts.length === 0 ? (
-        <p>Немає постів для відображення.</p>
+        <p>Немає дописів для відображення.</p>
       ) : (
         <div className="posts-list">
           {posts.map((post) => (
