@@ -12,13 +12,6 @@ const PopularPosts = () => {
     setError(null);
 
     try {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        setError("Увійдіть у систему.");
-        setLoading(false);
-        return;
-      }
-
       const response = await API.get("/popular-posts/");
 
       const topPosts = response.data;
