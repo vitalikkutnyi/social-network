@@ -25,7 +25,7 @@ const FollowButton = ({ username, initialFollowing, setUser, icon: Icon }) => {
 
     try {
       const response = await API.post(
-        `/profile/${username}/follow/`,
+        `/api/profile/${username}/follow/`,
         {},
         {
           headers: {
@@ -49,7 +49,7 @@ const FollowButton = ({ username, initialFollowing, setUser, icon: Icon }) => {
         setError("Не можна підписатися на себе.");
       } else if (err.response?.status === 401) {
         setError("Сесія закінчилася. Увійдіть знову.");
-        navigate("/login");
+        navigate("/login/");
       } else {
         setError("Щось пішло не так.");
       }

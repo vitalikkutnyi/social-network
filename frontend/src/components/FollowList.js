@@ -15,7 +15,7 @@ const FollowList = ({ type }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const url = `/profile/${username}/${type}/`;
+        const url = `/api/profile/${username}/${type}/`;
         const response = await API.get(url);
 
         setUsers(response.data);
@@ -60,14 +60,9 @@ const FollowList = ({ type }) => {
               >
                 <div className="user-info">
                   {user.avatar_url ? (
-                    <img
-                      src={`http://127.0.0.1:8000${user.avatar_url}`}
-                      alt={user.username}
-                    />
+                    <img src={`${user.avatar_url}`} alt={user.username} />
                   ) : (
-                    <img
-                      src={"http://127.0.0.1:8000/media/avatars/avatar.jpg"}
-                    />
+                    <img src={"/media/avatars/avatar.jpg"} />
                   )}
                   <span>{user.username}</span>
                 </div>

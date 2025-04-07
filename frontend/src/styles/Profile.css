@@ -139,8 +139,6 @@
   margin-top: 30px;
   flex-grow: 1;
   min-height: 0;
-  overflow-y: auto;
-  scrollbar-width: none;
 }
 
 .profile-posts h3 {
@@ -152,6 +150,8 @@
 
 .profile-posts-list {
   padding: 0 10px;
+  overflow-y: auto;
+  scrollbar-width: none;
 }
 
 .profile-posts .post-container {

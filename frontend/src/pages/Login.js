@@ -6,6 +6,7 @@ import AuthForm from "../components/AuthForm";
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [otpCode, setOtpCode] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
@@ -16,10 +17,11 @@ function Login() {
     const data = {
       username,
       password,
+      otp_code: otpCode,
     };
 
     try {
-      const response = await axios.post("http://localhost:8000/login/", data, {
+      const response = await axios.post("/api/login/", data, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -49,6 +51,8 @@ function Login() {
       setUsername={setUsername}
       password={password}
       setPassword={setPassword}
+      otpCode={otpCode}
+      setOtpCode={setOtpCode}
       error={error}
       message={message}
       buttonText="Увійти"

@@ -13,7 +13,7 @@ const LikeList = () => {
     const fetchLikes = async () => {
       try {
         const response = await API.get(
-          `/profile/${username}/posts/${postId}/likes/`
+          `/api/profile/${username}/posts/${postId}/likes/`
         );
         setLikes(response.data);
       } catch (err) {
@@ -48,7 +48,7 @@ const LikeList = () => {
                     src={
                       like.avatar_url
                         ? like.avatar_url
-                        : "http://127.0.0.1:8000/media/avatars/avatar.jpg"
+                        : "/media/avatars/avatar.jpg"
                     }
                     alt="Аватар"
                     className="like-avatar"

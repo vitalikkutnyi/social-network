@@ -12,7 +12,7 @@ const PopularPosts = () => {
     setError(null);
 
     try {
-      const response = await API.get("/popular-posts/");
+      const response = await API.get("/api/popular-posts/");
 
       const topPosts = response.data;
 

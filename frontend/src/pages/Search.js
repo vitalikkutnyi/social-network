@@ -31,12 +31,12 @@ const Search = () => {
     setError(null);
 
     try {
-      const usersResponse = await API.get("/users/search/", {
+      const usersResponse = await API.get("/api/users/search/", {
         params: { q: searchQuery },
       });
       setUsers(usersResponse.data);
 
-      const postsResponse = await API.get("/posts/search/", {
+      const postsResponse = await API.get("/api/posts/search/", {
         params: { query: searchQuery },
       });
       setPosts(postsResponse.data);
@@ -118,13 +118,13 @@ const Search = () => {
               >
                 {user.avatar_url ? (
                   <img
-                    src={`http://127.0.0.1:8000${user.avatar_url}`}
+                    src={`${user.avatar_url}`}
                     alt="Аватар"
                     className="search-avatar"
                   />
                 ) : (
                   <img
-                    src={"http://127.0.0.1:8000/media/avatars/avatar.jpg"}
+                    src={"/media/avatars/avatar.jpg"}
                     alt="Аватар за замовчуванням"
                     className="search-avatar"
                   />

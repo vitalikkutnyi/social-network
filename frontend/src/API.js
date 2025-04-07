@@ -36,13 +36,11 @@ API.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        console.log("Спроба оновити токен...");
         const response = await API.post(
-          "/token/refresh/",
+          "/api/token/refresh/",
           {},
           { withCredentials: true }
         );
-        console.log("Токен успішно оновлено:", response.data);
         return API(originalRequest);
       } catch (refreshError) {
         console.error(

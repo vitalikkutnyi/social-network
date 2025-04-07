@@ -20,7 +20,7 @@ const EditProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await API.get("/profile/edit/");
+        const response = await API.get("/api/profile/edit/");
 
         setData({
           username: response.data.username,
@@ -61,7 +61,7 @@ const EditProfile = () => {
     }
 
     try {
-      const response = await API.put("/profile/edit/", dataToSend, {
+      const response = await API.put("/api/profile/edit/", dataToSend, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -82,7 +82,7 @@ const EditProfile = () => {
 
   const handleDeleteAccount = async () => {
     try {
-      await API.delete("/profile/edit/");
+      await API.delete("/api/profile/edit/");
       navigate("/login/");
     } catch (error) {
       console.error("Помилка видалення акаунта:", error);
@@ -111,12 +111,12 @@ const EditProfile = () => {
               />
             ) : data.avatar ? (
               <img
-                src={`http://127.0.0.1:8000${data.avatar}`}
+                src={`${data.avatar}`}
                 className="file-input-container-avatar"
               />
             ) : (
               <img
-                src={"http://127.0.0.1:8000/media/avatars/avatar.jpg"}
+                src={"/media/avatars/avatar.jpg"}
                 className="file-input-container-avatar"
               />
             )}

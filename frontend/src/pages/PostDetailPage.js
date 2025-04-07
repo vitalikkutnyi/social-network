@@ -13,7 +13,7 @@ const PostDetailPage = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await API.get(`/profile/${username}/posts/${pk}/`);
+        const response = await API.get(`/api/profile/${username}/posts/${pk}/`);
         setPost(response.data);
       } catch (err) {
         setError(err.response?.data?.error || "Не вдалося завантажити допис.");

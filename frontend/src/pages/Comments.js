@@ -18,17 +18,17 @@ const Comments = ({ onCommentAdded }) => {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const userResponse = await API.get(`/profile/`);
+        const userResponse = await API.get(`/api/profile/`);
         setCurrentUser(userResponse.data.username);
 
         const postResponse = await API.get(
-          `/profile/${username}/posts/${postId}/`
+          `/api/profile/${username}/posts/${postId}/`
         );
         setPost(postResponse.data);
         setPostOwner(postResponse.data.author);
 
         const response = await API.get(
-          `/profile/${username}/posts/${postId}/comments/`
+          `/api/profile/${username}/posts/${postId}/comments/`
         );
         setComments(response.data.reverse());
       } catch (err) {
@@ -62,15 +62,8 @@ const Comments = ({ onCommentAdded }) => {
     setError(null);
 
     try {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        setError("Увійдіть у систему.");
-        setLoading(false);
-        return;
-      }
-
       const response = await API.post(
-        `/profile/${username}/posts/${postId}/comments/`,
+        `/api/profile/${username}/posts/${postId}/comments/`,
         { text: newComment }
       );
       setComments([response.data, ...comments]);
@@ -94,15 +87,8 @@ const Comments = ({ onCommentAdded }) => {
     setError(null);
 
     try {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        setError("Увійдіть у систему.");
-        setLoading(false);
-        return;
-      }
-
       await API.delete(
-        `/profile/${username}/posts/${postId}/comments/${commentId}/delete/`
+        `/api/profile/${username}/posts/${postId}/comments/${commentId}/delete/`
       );
       setComments(comments.filter((comment) => comment.id !== commentId));
       setPost((prevPost) => ({
@@ -159,9 +145,7 @@ const Comments = ({ onCommentAdded }) => {
                     {comment.avatar ? (
                       <img src={comment.avatar} alt="Аватар" />
                     ) : (
-                      <img
-                        src={"http://127.0.0.1:8000/media/avatars/avatar.jpg"}
-                      />
+                      <img src={"/media/avatars/avatar.jpg"} />
                     )}
                     <strong>{comment.author}</strong>
                     {postOwner === comment.author && (

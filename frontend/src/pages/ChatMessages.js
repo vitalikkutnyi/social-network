@@ -21,16 +21,16 @@ const ChatMessages = () => {
 
   const fetchChatData = async () => {
     try {
-      const userResponse = await API.get("/profile");
+      const userResponse = await API.get("/api/profile");
       setCurrentUser(userResponse.data.username);
 
-      const chatResponse = await API.get(`/chats/${chatId}/`);
+      const chatResponse = await API.get(`/api/chats/${chatId}/`);
       setOtherUser({
         username: chatResponse.data.other_user,
         avatar_url: chatResponse.data.avatar_url,
       });
 
-      const messageResponse = await API.get(`/chats/${chatId}/messages/`);
+      const messageResponse = await API.get(`/api/chats/${chatId}/messages/`);
       const sortedMessages = messageResponse.data.sort(
         (a, b) => new Date(a.sent_at) - new Date(b.sent_at)
       );
@@ -72,7 +72,7 @@ const ChatMessages = () => {
 
       for (const msg of unreadMessages) {
         const response = await API.put(
-          `/chats/${chatId}/messages/${msg.message_id}/read/`,
+          `/api/chats/${chatId}/messages/${msg.message_id}/read/`,
           {}
         );
       }
@@ -96,7 +96,7 @@ const ChatMessages = () => {
 
     try {
       const response = await API.post(
-        `/chats/${chatId}/messages/`,
+        `/api/chats/${chatId}/messages/`,
         { text: newMessage },
         {
           headers: {
@@ -130,13 +130,13 @@ const ChatMessages = () => {
         <div className="user-info">
           {otherUser.avatar_url ? (
             <img
-              src={`http://127.0.0.1:8000${otherUser.avatar_url}`}
+              src={`${otherUser.avatar_url}`}
               alt={otherUser.username}
               className="chat-avatar"
             />
           ) : (
             <img
-              src="http://127.0.0.1:8000/media/avatars/avatar.jpg"
+              src="/media/avatars/avatar.jpg"
               alt="Аватар за замовчуванням"
               className="chat-avatar"
             />
@@ -157,13 +157,13 @@ const ChatMessages = () => {
             >
               {message.sender_avatar_url ? (
                 <img
-                  src={`http://127.0.0.1:8000${message.sender_avatar_url}`}
+                  src={`${message.sender_avatar_url}`}
                   alt="Аватар"
                   className="message-avatar"
                 />
               ) : (
                 <img
-                  src="http://127.0.0.1:8000/media/avatars/avatar.jpg"
+                  src="/media/avatars/avatar.jpg"
                   alt="Аватар за замовчуванням"
                   className="message-avatar"
                 />

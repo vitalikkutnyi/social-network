@@ -12,7 +12,7 @@ const HomePage = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await API.get("/");
+        const response = await API.get("/api/");
 
         setPosts(response.data);
       } catch (err) {

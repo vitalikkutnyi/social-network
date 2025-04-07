@@ -22,7 +22,7 @@ const Sidebar = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await API.post("/logout/");
+      const response = await API.post("/api/logout/");
 
       if (response.status === 200) {
         navigate("/login/");

@@ -23,7 +23,7 @@ function Register() {
     };
 
     try {
-      const response = await API.post("/register/", data, {
+      const response = await API.post("/api/register/", data, {
         headers: {
           "Content-Type": "application/json",
         },

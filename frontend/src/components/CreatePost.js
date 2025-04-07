@@ -33,7 +33,7 @@ const CreatePost = ({ username, onPostCreated }) => {
 
     try {
       const response = await API.post(
-        `/profile/${username}/posts/create/`,
+        `/api/profile/${username}/posts/create/`,
         formData,
         {
           headers: {

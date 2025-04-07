@@ -13,6 +13,7 @@ const PageTitle = ({ chatUsername }) => {
       "/search/": "Пошук",
       "/popular-posts/": "Популярне",
       "/chats/": "Чати",
+      "/ai-chat/": "Спілкування з ШІ",
       "/profile/edit/": "Редагування профілю",
       "/users/search/": "Пошук",
       "/stories/": "Історії",

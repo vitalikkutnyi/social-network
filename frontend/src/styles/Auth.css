@@ -160,7 +160,7 @@
 
 .auth-modal-overlay {
   position: fixed;
-  top: 0;
+  top: 60px;
   left: 0;
   right: 0;
   bottom: 0;
@@ -179,7 +179,7 @@
   color: white;
   text-align: center;
   position: fixed;
-  top: 50%;
+  top: calc(50% + 30px);
   left: 50%;
   transform: translate(-50%, -50%);
   box-sizing: border-box;
@@ -234,6 +234,14 @@
   .register-form {
     top: calc(50% + 25px);
   }
+
+  .auth-modal-overlay {
+    top: 50px;
+  }
+
+  .auth-modal-content {
+    top: calc(50% + 25px);
+  }
 }
 
 @media (max-width: 480px) {
@@ -286,31 +294,5 @@
     min-width: 100%;
     padding: 15px;
     border-radius: 0;
-  }
-}
-
-@media (max-width: 1024px) and (max-height: 600px) {
-  .register-form,
-  .auth-modal-content {
-    max-width: 400px;
-    width: 75%;
-    padding: 20px;
-  }
-
-  .register-form h1,
-  .auth-modal-content h2 {
-    font-size: 24px;
-  }
-
-  .register-form input,
-  .auth-modal-content p {
-    font-size: 14px;
-    padding: 10px;
-  }
-
-  .register-form button,
-  .auth-modal-content button {
-    font-size: 14px;
-    padding: 12px 0;
   }
 }

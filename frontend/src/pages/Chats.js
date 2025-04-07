@@ -17,10 +17,10 @@ const Chats = () => {
   useEffect(() => {
     const fetchChats = async () => {
       try {
-        const userResponse = await API.get("/profile/");
+        const userResponse = await API.get("/api/profile/");
         setCurrentUser(userResponse.data.username);
 
-        const response = await API.get("/chats/");
+        const response = await API.get("/api/chats/");
 
         const sortedChats = response.data.sort((a, b) => {
           const aTime = a.last_message
@@ -50,7 +50,7 @@ const Chats = () => {
     }
 
     try {
-      const response = await API.get(`/users/search/?q=${query}`);
+      const response = await API.get(`/api/users/search/?q=${query}`);
       setSearchResults(response.data);
     } catch (err) {
       setError("Не вдалося знайти користувачів.");
@@ -73,7 +73,7 @@ const Chats = () => {
     }
 
     try {
-      const response = await API.post("/chats/create/", {
+      const response = await API.post("/api/chats/create/", {
         user2: selectedUsername,
       });
 
@@ -105,7 +105,7 @@ const Chats = () => {
 
   const handleDeleteChat = async (chatId) => {
     try {
-      await API.delete(`/chats/${chatId}/delete/`);
+      await API.delete(`/api/chats/${chatId}/delete/`);
 
       setChats((prevChats) => prevChats.filter((chat) => chat.id !== chatId));
       setError(null);
@@ -182,13 +182,13 @@ const Chats = () => {
                   >
                     {user.avatar_url ? (
                       <img
-                        src={`http://127.0.0.1:8000${user.avatar_url}`}
+                        src={`${user.avatar_url}`}
                         alt="Аватар"
                         className="chat-search-avatar"
                       />
                     ) : (
                       <img
-                        src={"http://127.0.0.1:8000/media/avatars/avatar.jpg"}
+                        src={"/media/avatars/avatar.jpg"}
                         alt="Аватар за замовчуванням"
                         className="chat-search-avatar"
                       />
@@ -228,13 +228,13 @@ const Chats = () => {
                     <div className="chat-info-header-left">
                       {chat.avatar_url ? (
                         <img
-                          src={`http://127.0.0.1:8000${chat.avatar_url}`}
+                          src={`${chat.avatar_url}`}
                           alt="Аватар"
                           className="chat-info-avatar"
                         />
                       ) : (
                         <img
-                          src={"http://127.0.0.1:8000/media/avatars/avatar.jpg"}
+                          src={"/media/avatars/avatar.jpg"}
                           alt="Аватар за замовчуванням"
                           className="chat-info-avatar"
                         />

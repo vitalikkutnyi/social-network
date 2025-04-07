@@ -20,7 +20,7 @@ const Story = ({ username, avatarUrl, isOwnProfile, viewerId }) => {
 
   const fetchStories = async () => {
     try {
-      const response = await API.get(`/stories/?username=${username}`);
+      const response = await API.get(`/api/stories/?username=${username}`);
       setStories(response.data);
     } catch (error) {
       console.error(
@@ -36,7 +36,7 @@ const Story = ({ username, avatarUrl, isOwnProfile, viewerId }) => {
     }
     try {
       const response = await API.get(
-        `/viewed-stories/?viewer_id=${effectiveViewerId}&username=${username}`
+        `/api/viewed-stories/?viewer_id=${effectiveViewerId}&username=${username}`
       );
       const viewed = new Set(response.data.map((item) => item.story_id));
       setViewedStories(viewed);
@@ -66,7 +66,7 @@ const Story = ({ username, avatarUrl, isOwnProfile, viewerId }) => {
     } else {
       try {
         const token = localStorage.getItem("access_token");
-        const response = await API.post("/viewed-stories/", {
+        const response = await API.post("/api/viewed-stories/", {
           story_id: storyId,
           user_id: effectiveViewerId,
         });
@@ -91,7 +91,7 @@ const Story = ({ username, avatarUrl, isOwnProfile, viewerId }) => {
       return;
     }
     try {
-      await API.delete(`/viewed-stories/${storyId}/`, {
+      await API.delete(`/api/viewed-stories/${storyId}/`, {
         data: { user_id: effectiveViewerId },
       });
       setViewedStories((prev) => {
@@ -168,7 +168,7 @@ const Story = ({ username, avatarUrl, isOwnProfile, viewerId }) => {
     if (storyVideo) formData.append("video", storyVideo);
 
     try {
-      const response = await API.post("/stories/", formData, {
+      const response = await API.post("/api/stories/", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -187,7 +187,7 @@ const Story = ({ username, avatarUrl, isOwnProfile, viewerId }) => {
   const handleDeleteStory = async () => {
     const storyId = stories[currentStoryIndex].id;
     try {
-      await API.delete(`/stories/${storyId}/`, {});
+      await API.delete(`/api/stories/${storyId}/`, {});
       if (viewedStories.has(storyId)) {
         await deleteViewedStory(storyId);
       }

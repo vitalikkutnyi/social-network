@@ -84,8 +84,8 @@ const Post = ({
     const fetchUser = async () => {
       try {
         const [currentUserResponse, userResponse] = await Promise.all([
-          API.get(`/profile/`, {}),
-          API.get(`/profile/${username}/`, {}),
+          API.get(`/api/profile/`, {}),
+          API.get(`/api/profile/${username}/`, {}),
         ]);
 
         setCurrentUser(currentUserResponse.data.username);
@@ -132,7 +132,7 @@ const Post = ({
 
     try {
       const response = await API.post(
-        `/profile/${currentUser}/posts/${id}/repost/`,
+        `/api/profile/${currentUser}/posts/${id}/repost/`,
         {}
       );
       setRepostsCount(response.data.reposts_count);
@@ -157,7 +157,7 @@ const Post = ({
 
     try {
       const response = await API.post(
-        `/profile/${username}/posts/${id}/like/`,
+        `/api/profile/${username}/posts/${id}/like/`,
         {}
       );
 
@@ -211,7 +211,7 @@ const Post = ({
     const data = { text: editedText };
 
     try {
-      await API.put(`/profile/${username}/posts/${id}/update/`, data, {
+      await API.put(`/api/profile/${username}/posts/${id}/update/`, data, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -230,7 +230,7 @@ const Post = ({
     setLoading(true);
     setError(null);
     try {
-      await API.delete(`/profile/${username}/posts/${id}/delete/`);
+      await API.delete(`/api/profile/${username}/posts/${id}/delete/`);
       setIsDeleted(true);
       onDelete(id);
     } catch (err) {
@@ -248,7 +248,7 @@ const Post = ({
 
     try {
       const response = await API.post(
-        `/profile/${username}/posts/${id}/pin/`,
+        `/api/profile/${username}/posts/${id}/pin/`,
         {}
       );
       const newPinnedStatus = response.data.is_pinned;
@@ -291,12 +291,9 @@ const Post = ({
         <div className="post-container-header">
           <div className="post-container-user">
             {user.avatar_url ? (
-              <img
-                src={`http://127.0.0.1:8000${user.avatar_url}`}
-                alt="Аватар"
-              />
+              <img src={`${user.avatar_url}`} alt="Аватар" />
             ) : (
-              <img src={"http://127.0.0.1:8000/media/avatars/avatar.jpg"} />
+              <img src={"/media/avatars/avatar.jpg"} />
             )}
             <span>
               <strong>{user.username}</strong>

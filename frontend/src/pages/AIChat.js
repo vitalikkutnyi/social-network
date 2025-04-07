@@ -37,7 +37,7 @@ const AIChat = () => {
 
     try {
       const response = await API.post(
-        "/ai-chat/",
+        "/api/ai-chat/",
         { message: newMessage },
         {
           headers: {
@@ -72,7 +72,7 @@ const AIChat = () => {
       <div className="chat-header">
         <div className="user-info">
           <img
-            src="http://127.0.0.1:8000/media/avatars/gemini.png"
+            src="/media/avatars/gemini.png"
             alt="Google Gemini"
             className="chat-avatar"
           />
@@ -92,13 +92,13 @@ const AIChat = () => {
             >
               {message.sender_name === "Ви" ? (
                 <img
-                  src="http://127.0.0.1:8000/media/avatars/avatar.jpg"
+                  src="/media/avatars/avatar.jpg"
                   alt="Ви"
                   className="message-avatar"
                 />
               ) : (
                 <img
-                  src="http://127.0.0.1:8000/media/avatars/gemini.png"
+                  src="/media/avatars/gemini.png"
                   alt="Google Gemini"
                   className="message-avatar"
                 />

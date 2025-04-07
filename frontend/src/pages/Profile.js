@@ -25,7 +25,7 @@ const Profile = () => {
 
   const fetchUserProfile = async () => {
     try {
-      const url = username ? `/profile/${username}/` : "/profile/";
+      const url = username ? `/api/profile/${username}/` : "/api/profile/";
       const response = await API.get(url, { withCredentials: true });
       const sortedPosts = [...response.data.posts].sort((a, b) => {
         if (a.is_pinned === b.is_pinned) {
@@ -36,7 +36,7 @@ const Profile = () => {
       setUser({ ...response.data, posts: sortedPosts });
 
       if (!currentUserProfile) {
-        const currentUserResponse = await API.get("/profile/", {
+        const currentUserResponse = await API.get("/api/profile/", {
           withCredentials: true,
         });
         setCurrentUserProfile({
@@ -99,30 +99,50 @@ const Profile = () => {
           ? { ...post, reposts_count: repostData.reposts_count }
           : post
       );
+
+      if (isOwnProfile) {
+        const newRepost = {
+          ...repostData,
+          is_repost: true,
+          repost_date: new Date().toISOString(),
+        };
+        const finalPosts = [newRepost, ...updatedPosts].sort((a, b) => {
+          if (a.is_pinned !== b.is_pinned) {
+            return b.is_pinned - a.is_pinned;
+          }
+          const dateA = a.repost_date || a.created_at;
+          const dateB = b.repost_date || b.created_at;
+          return new Date(dateB) - new Date(dateA);
+        });
+        return { ...prevUser, posts: finalPosts };
+      }
+
       return { ...prevUser, posts: updatedPosts };
     });
 
-    setCurrentUserProfile((prevProfile) => {
-      const newRepost = {
-        ...repostData,
-        is_repost: true,
-        repost_date: new Date().toISOString(),
-      };
-      const finalPosts = [newRepost, ...prevProfile.posts].sort((a, b) => {
-        if (a.is_pinned !== b.is_pinned) {
-          return b.is_pinned - a.is_pinned;
-        }
-        const dateA = a.repost_date || a.created_at;
-        const dateB = b.repost_date || b.created_at;
-        return new Date(dateB) - new Date(dateA);
+    if (!isOwnProfile) {
+      setCurrentUserProfile((prevProfile) => {
+        const newRepost = {
+          ...repostData,
+          is_repost: true,
+          repost_date: new Date().toISOString(),
+        };
+        const finalPosts = [newRepost, ...prevProfile.posts].sort((a, b) => {
+          if (a.is_pinned !== b.is_pinned) {
+            return b.is_pinned - a.is_pinned;
+          }
+          const dateA = a.repost_date || a.created_at;
+          const dateB = b.repost_date || b.created_at;
+          return new Date(dateB) - new Date(dateA);
+        });
+        return { ...prevProfile, posts: finalPosts };
       });
-      return { ...prevProfile, posts: finalPosts };
-    });
+    }
   };
 
   const handleMessageUser = async () => {
     try {
-      const chatsResponse = await API.get("/chats/");
+      const chatsResponse = await API.get("/api/chats/");
       const existingChat = chatsResponse.data.find(
         (chat) => chat.other_user === username
       );
@@ -132,7 +152,7 @@ const Profile = () => {
         return;
       }
 
-      const createResponse = await API.post("/chats/create/", {
+      const createResponse = await API.post("/api/chats/create/", {
         user2: username,
       });
       const chatId = createResponse.data.id;
@@ -200,8 +220,8 @@ const Profile = () => {
             username={user.username}
             avatarUrl={
               user.avatar_url
-                ? `http://127.0.0.1:8000${user.avatar_url}`
-                : "http://127.0.0.1:8000/media/avatars/avatar.jpg"
+                ? `${user.avatar_url}`
+                : "/media/avatars/avatar.jpg"
             }
             isOwnProfile={isOwnProfile}
             viewerId={currentUserProfile?.id}
