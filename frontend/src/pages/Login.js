@@ -55,7 +55,7 @@ function Login() {
       anotherContent={
         <>
           <p>Ще не зареєстровані?</p>
-          <button type="button" onClick={() => navigate("/register")}>
+          <button type="button" onClick={() => navigate("/register/")}>
             Зареєструватися
           </button>
         </>
