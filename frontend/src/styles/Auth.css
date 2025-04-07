@@ -10,7 +10,7 @@
   color: white;
   box-sizing: border-box;
   overflow: hidden;
-  top: 50%;
+  top: calc(50% + 30px);
   left: 50%;
   transform: translate(-50%, -50%);
   margin: 0;
@@ -228,6 +228,12 @@
 
 .code {
   margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .register-form {
+    top: calc(50% + 25px);
+  }
 }
 
 @media (max-width: 480px) {
