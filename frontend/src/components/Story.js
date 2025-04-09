@@ -91,19 +91,13 @@ const Story = ({ username, avatarUrl, isOwnProfile, viewerId }) => {
       return;
     }
     try {
-      await API.delete(`/api/viewed-stories/${storyId}/`, {
-        data: { user_id: effectiveViewerId },
-      });
-      setViewedStories((prev) => {
-        const updated = new Set(prev);
-        updated.delete(storyId);
-        return updated;
-      });
+      await API.delete(`/api/viewed-stories/${storyId}/`);
     } catch (error) {
-      console.error(
-        "Помилка видалення перегляду:",
-        error.response?.data || error.message
-      );
+      if (error.response?.status === 404) {
+        console.log("Запис про перегляд вже був видалений.");
+      } else {
+        console.error("Помилка при видаленні перегляду:", error.message);
+      }
     }
   };
 

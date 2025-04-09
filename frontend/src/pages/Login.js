@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Helmet } from "react-helmet";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import AuthForm from "../components/AuthForm";
@@ -44,27 +45,63 @@ function Login() {
   };
 
   return (
-    <AuthForm
-      title="Авторизація"
-      onSubmit={handleSubmit}
-      username={username}
-      setUsername={setUsername}
-      password={password}
-      setPassword={setPassword}
-      otpCode={otpCode}
-      setOtpCode={setOtpCode}
-      error={error}
-      message={message}
-      buttonText="Увійти"
-      anotherContent={
-        <>
-          <p>Ще не зареєстровані?</p>
-          <button type="button" onClick={() => navigate("/register/")}>
-            Зареєструватися
-          </button>
-        </>
-      }
-    />
+    <>
+      <Helmet>
+        <meta name="robots" content="index, follow" />
+        <meta
+          name="description"
+          content="Авторизуйтеся в соціальній мережі Lynquora, щоби спілкуватися, ділитися публікаціями та знаходити нових друзів."
+        />
+        <meta
+          name="keywords"
+          content="вхід, логін, авторизація, соціальна мережа, Lynquora, спілкування, друзі"
+        />
+        <meta property="og:title" content="Авторизація / Lynquora" />
+        <meta
+          property="og:description"
+          content="Авторизуйтеся в соціальній мережі Lynquora, щоби спілкуватися, ділитися публікаціями та знаходити нових друзів."
+        />
+        <meta
+          property="og:image"
+          content="https://lynquora.me/favicon.ico?v=3"
+        />
+        <meta property="og:url" content="https://lynquora.me/login/" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Авторизація / Lynquora" />
+        <meta
+          name="twitter:description"
+          content="Авторизуйтеся в соціальній мережі Lynquora, щоби спілкуватися, ділитися публікаціями та знаходити нових друзів."
+        />
+        <meta
+          name="twitter:image"
+          content="https://lynquora.me/favicon.ico?v=3"
+        />
+        <link rel="canonical" href="https://lynquora.me/login/" />
+        <title>Авторизація / Lynquora</title>
+      </Helmet>
+      <AuthForm
+        title="Авторизація"
+        onSubmit={handleSubmit}
+        username={username}
+        setUsername={setUsername}
+        password={password}
+        setPassword={setPassword}
+        otpCode={otpCode}
+        setOtpCode={setOtpCode}
+        error={error}
+        message={message}
+        buttonText="Увійти"
+        anotherContent={
+          <>
+            <p>Ще не зареєстровані?</p>
+            <button type="button" onClick={() => navigate("/register/")}>
+              Зареєструватися
+            </button>
+          </>
+        }
+      />
+    </>
   );
 }
 
