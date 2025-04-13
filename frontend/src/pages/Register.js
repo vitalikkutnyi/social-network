@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import AuthForm from "../components/AuthForm";
 import API from "../API";
@@ -58,30 +59,35 @@ function Register() {
   };
 
   return (
-    <AuthForm
-      title="Реєстрація"
-      onSubmit={handleSubmit}
-      username={username}
-      setUsername={setUsername}
-      password={password}
-      setPassword={setPassword}
-      password2={password2}
-      setPassword2={setPassword2}
-      qrCode={qrCode}
-      setQrCode={setQrCode}
-      error={error}
-      message={message}
-      buttonText="Зареєструватися"
-      anotherContent={
-        <>
-          <p>Вже зареєстровані?</p>
-          <button type="button" onClick={() => navigate("/login/")}>
-            Увійти
-          </button>
-        </>
-      }
-      onContinue={handleContinue}
-    />
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex" />
+      </Helmet>
+      <AuthForm
+        title="Реєстрація"
+        onSubmit={handleSubmit}
+        username={username}
+        setUsername={setUsername}
+        password={password}
+        setPassword={setPassword}
+        password2={password2}
+        setPassword2={setPassword2}
+        qrCode={qrCode}
+        setQrCode={setQrCode}
+        error={error}
+        message={message}
+        buttonText="Зареєструватися"
+        anotherContent={
+          <>
+            <p>Вже зареєстровані?</p>
+            <button type="button" onClick={() => navigate("/login/")}>
+              Увійти
+            </button>
+          </>
+        }
+        onContinue={handleContinue}
+      />
+    </>
   );
 }
 

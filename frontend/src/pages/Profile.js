@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet";
 import { useNavigate, useParams } from "react-router-dom";
 import Post from "../components/Post";
 import FollowButton from "../components/FollowButton";
@@ -206,98 +207,103 @@ const Profile = () => {
   const isOwnProfile = !username || username === currentUsername;
 
   return (
-    <div className="profile-container">
-      <PageTitle />
-      {isOwnProfile && (
-        <CreatePost
-          username={user.username}
-          onPostCreated={handlePostCreated}
-        />
-      )}
-      <div className="profile-header">
-        <div className="profile-header-left">
-          <Story
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex" />
+      </Helmet>
+      <div className="profile-container">
+        <PageTitle />
+        {isOwnProfile && (
+          <CreatePost
             username={user.username}
-            avatarUrl={
-              user.avatar_url
-                ? `${user.avatar_url}`
-                : "/media/avatars/avatar.jpg"
-            }
-            isOwnProfile={isOwnProfile}
-            viewerId={currentUserProfile?.id}
+            onPostCreated={handlePostCreated}
           />
-          <h2>{user.username}</h2>
+        )}
+        <div className="profile-header">
+          <div className="profile-header-left">
+            <Story
+              username={user.username}
+              avatarUrl={
+                user.avatar_url
+                  ? `${user.avatar_url}`
+                  : "/media/avatars/avatar.jpg"
+              }
+              isOwnProfile={isOwnProfile}
+              viewerId={currentUserProfile?.id}
+            />
+            <h2>{user.username}</h2>
+          </div>
+          <div className="profile-header-buttons">
+            {isOwnProfile ? (
+              <>
+                <button
+                  onClick={handleEditProfile}
+                  className="profile-header-button"
+                >
+                  <BiMessageSquareEdit className="edit-icon" />
+                  <span className="button-text">Редагувати профіль</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={handleMessageUser}
+                  className="profile-header-button profile-header-button--message"
+                >
+                  <TbMessage2Filled className="message-icon" />
+                  <span className="button-text">Повідомлення</span>
+                </button>
+                <FollowButton
+                  username={username}
+                  initialFollowing={user.is_following}
+                  setUser={setUser}
+                />
+              </>
+            )}
+          </div>
         </div>
-        <div className="profile-header-buttons">
-          {isOwnProfile ? (
-            <>
-              <button
-                onClick={handleEditProfile}
-                className="profile-header-button"
-              >
-                <BiMessageSquareEdit className="edit-icon" />
-                <span className="button-text">Редагувати профіль</span>
-              </button>
-            </>
+        <p className="profile-bio">{user.bio || "Не вказано"}</p>
+        <div className="profile-stats">
+          <div className="profile-stats-left">
+            <p onClick={() => navigate(`/profile/${user.username}/followers/`)}>
+              Слідкувачі: {user.followers_count}
+            </p>
+            <p onClick={() => navigate(`/profile/${user.username}/following/`)}>
+              Слідкування: {user.following_count}
+            </p>
+          </div>
+          <p>
+            Дата реєстрації: {new Date(user.date_joined).toLocaleDateString()}
+          </p>
+        </div>
+        <div className="profile-posts">
+          <h3>Дописи</h3>
+          {user.posts && user.posts.length > 0 ? (
+            <div className="profile-posts-list">
+              {user.posts.map((post) => (
+                <Post
+                  key={post.id}
+                  post={post}
+                  username={user.username}
+                  onDelete={handlePostDelete}
+                  onCommentAdded={() => handleCommentAdded(post.id)}
+                  onPinToggle={handlePinToggle}
+                  onRepost={handleRepost}
+                />
+              ))}
+            </div>
           ) : (
-            <>
-              <button
-                onClick={handleMessageUser}
-                className="profile-header-button profile-header-button--message"
-              >
-                <TbMessage2Filled className="message-icon" />
-                <span className="button-text">Повідомлення</span>
-              </button>
-              <FollowButton
-                username={username}
-                initialFollowing={user.is_following}
-                setUser={setUser}
-              />
-            </>
+            <p>Немає дописів.</p>
           )}
         </div>
-      </div>
-      <p className="profile-bio">{user.bio || "Не вказано"}</p>
-      <div className="profile-stats">
-        <div className="profile-stats-left">
-          <p onClick={() => navigate(`/profile/${user.username}/followers/`)}>
-            Слідкувачі: {user.followers_count}
-          </p>
-          <p onClick={() => navigate(`/profile/${user.username}/following/`)}>
-            Слідкування: {user.following_count}
-          </p>
-        </div>
-        <p>
-          Дата реєстрації: {new Date(user.date_joined).toLocaleDateString()}
-        </p>
-      </div>
-      <div className="profile-posts">
-        <h3>Дописи</h3>
-        {user.posts && user.posts.length > 0 ? (
-          <div className="profile-posts-list">
-            {user.posts.map((post) => (
-              <Post
-                key={post.id}
-                post={post}
-                username={user.username}
-                onDelete={handlePostDelete}
-                onCommentAdded={() => handleCommentAdded(post.id)}
-                onPinToggle={handlePinToggle}
-                onRepost={handleRepost}
-              />
-            ))}
-          </div>
-        ) : (
-          <p>Немає дописів.</p>
+        {isCreateStoryModalOpen && (
+          <Story.CreateStoryModal
+            onClose={() => setIsCreateStoryModalOpen(false)}
+            onStoryCreated={handleStoryCreated}
+          />
         )}
       </div>
-      {isCreateStoryModalOpen && (
-        <Story.CreateStoryModal
-          onClose={() => setIsCreateStoryModalOpen(false)}
-          onStoryCreated={handleStoryCreated}
-        />
-      )}
-    </div>
+    </>
   );
 };
 

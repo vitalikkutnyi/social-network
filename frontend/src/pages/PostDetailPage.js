@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Helmet } from "react-helmet";
 import { useParams, useNavigate } from "react-router-dom";
 import Post from "../components/Post.js";
 import API from "../API";
@@ -30,15 +31,20 @@ const PostDetailPage = () => {
   if (!post) return <p>Допис не знайдено.</p>;
 
   return (
-    <div className="post-detail-container">
-      <Post post={post} username={username} />
-      <button
-        onClick={() => navigate(`/profile/${username}/posts/${pk}/comments/`)}
-        className="post-detail-container-button"
-      >
-        Перейти до коментарів
-      </button>
-    </div>
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex" />
+      </Helmet>
+      <div className="post-detail-container">
+        <Post post={post} username={username} />
+        <button
+          onClick={() => navigate(`/profile/${username}/posts/${pk}/comments/`)}
+          className="post-detail-container-button"
+        >
+          Перейти до коментарів
+        </button>
+      </div>
+    </>
   );
 };
 

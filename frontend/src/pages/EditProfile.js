@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import API from "../API";
 
@@ -91,80 +92,85 @@ const EditProfile = () => {
   };
 
   return (
-    <div className="profile-edit-container">
-      <h2 className="profile-edit-container-title">Редагування профілю</h2>
-      <form onSubmit={handleSubmit} className="profile-form">
-        <div className="file-input-container">
-          <input
-            type="file"
-            accept="image/*"
-            name="avatar"
-            id="avatar"
-            style={{ display: "none" }}
-            onChange={handleFileChange}
-          />
-          <div>
-            {data.avatarPreview ? (
-              <img
-                src={data.avatarPreview}
-                className="file-input-container-avatar"
-              />
-            ) : data.avatar ? (
-              <img
-                src={`${data.avatar}`}
-                className="file-input-container-avatar"
-              />
-            ) : (
-              <img
-                src={"/media/avatars/avatar.jpg"}
-                className="file-input-container-avatar"
-              />
-            )}
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex" />
+      </Helmet>
+      <div className="profile-edit-container">
+        <h2 className="profile-edit-container-title">Редагування профілю</h2>
+        <form onSubmit={handleSubmit} className="profile-form">
+          <div className="file-input-container">
+            <input
+              type="file"
+              accept="image/*"
+              name="avatar"
+              id="avatar"
+              style={{ display: "none" }}
+              onChange={handleFileChange}
+            />
+            <div>
+              {data.avatarPreview ? (
+                <img
+                  src={data.avatarPreview}
+                  className="file-input-container-avatar"
+                />
+              ) : data.avatar ? (
+                <img
+                  src={`${data.avatar}`}
+                  className="file-input-container-avatar"
+                />
+              ) : (
+                <img
+                  src={"/media/avatars/avatar.jpg"}
+                  className="file-input-container-avatar"
+                />
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => document.getElementById("avatar").click()}
+              className="file-input-button"
+            >
+              Вибрати файл
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => document.getElementById("avatar").click()}
-            className="file-input-button"
-          >
-            Вибрати файл
-          </button>
-        </div>
-        <label htmlFor="username">Ім'я користувача:</label>
-        <input
-          type="text"
-          name="username"
-          id="username"
-          value={data.username || ""}
-          onChange={handleChange}
-        />
-        <label htmlFor="bio">Біографія:</label>
-        <textarea
-          type="text"
-          name="bio"
-          id="bio"
-          value={data.bio || ""}
-          onChange={handleChange}
-        />
-        <div className="buttons">
-          <button type="submit" disabled={loading}>
-            {loading ? "Оновлення..." : "Зберегти зміни"}
-          </button>
-          <button type="button" onClick={goToProfile}>
-            Назад
-          </button>
-        </div>
-        <div className="separator"></div>
-        <div className="profile-delete-container">
-          <button
-            type="button"
-            onClick={handleDeleteAccount}
-            className="profile-delete-button"
-          >
-            Видалити акаунт
-          </button>
-        </div>
-      </form>
-    </div>
+          <label htmlFor="username">Ім'я користувача:</label>
+          <input
+            type="text"
+            name="username"
+            id="username"
+            value={data.username || ""}
+            onChange={handleChange}
+          />
+          <label htmlFor="bio">Біографія:</label>
+          <textarea
+            type="text"
+            name="bio"
+            id="bio"
+            value={data.bio || ""}
+            onChange={handleChange}
+          />
+          <div className="buttons">
+            <button type="submit" disabled={loading}>
+              {loading ? "Оновлення..." : "Зберегти зміни"}
+            </button>
+            <button type="button" onClick={goToProfile}>
+              Назад
+            </button>
+          </div>
+          <div className="separator"></div>
+          <div className="profile-delete-container">
+            <button
+              type="button"
+              onClick={handleDeleteAccount}
+              className="profile-delete-button"
+            >
+              Видалити акаунт
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
   );
 };
 

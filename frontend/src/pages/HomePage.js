@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import Post from "../components/Post";
 import API from "../API";
@@ -65,26 +66,31 @@ const HomePage = () => {
   if (error) return <p>{error}</p>;
 
   return (
-    <div className="homepage-container">
-      <h2>Головна сторінка</h2>
-      {posts.length === 0 ? (
-        <p>Немає дописів для відображення.</p>
-      ) : (
-        <div className="posts-list">
-          {posts.map((post) => (
-            <Post
-              key={post.id}
-              post={post}
-              username={post.author_username || post.author}
-              onDelete={handleDelete}
-              onPinToggle={handlePinToggle}
-              onCommentAdded={handleCommentAdded}
-              onRepost={handleRepost}
-            />
-          ))}
-        </div>
-      )}
-    </div>
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex" />
+      </Helmet>
+      <div className="homepage-container">
+        <h2>Головна сторінка</h2>
+        {posts.length === 0 ? (
+          <p>Немає дописів для відображення.</p>
+        ) : (
+          <div className="posts-list">
+            {posts.map((post) => (
+              <Post
+                key={post.id}
+                post={post}
+                username={post.author_username || post.author}
+                onDelete={handleDelete}
+                onPinToggle={handlePinToggle}
+                onCommentAdded={handleCommentAdded}
+                onRepost={handleRepost}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 

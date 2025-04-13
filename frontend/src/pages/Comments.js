@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Helmet } from "react-helmet";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaTrash } from "react-icons/fa";
 import Post from "../components/Post";
@@ -103,82 +104,87 @@ const Comments = ({ onCommentAdded }) => {
   };
 
   return (
-    <div className="comments-container">
-      {loading ? (
-        <p>Завантаження...</p>
-      ) : post ? (
-        <span className="comments-post-container">
-          <Post
-            key={post.id}
-            post={post}
-            username={username}
-            disableNavigation={true}
-            hideMenu={true}
-          />
-        </span>
-      ) : (
-        <p>Допис не знайдено або видалено.</p>
-      )}
-      <div className="comment-form">
-        <textarea
-          value={newComment}
-          onChange={handleCommentChange}
-          placeholder="Введіть текст..."
-          rows="3"
-        ></textarea>
-        <button onClick={handleCommentSubmit} disabled={loading}>
-          {loading ? "Завантаження..." : "Додати коментар"}
-        </button>
-      </div>
-      <div className="post-comments">
-        <h4>Коментарі ({comments.length})</h4>
-        {loading && <p>Завантаження коментарів...</p>}
-        {error && <p>{error}</p>}
-        {!loading && comments.length === 0 ? (
-          <p>Немає коментарів.</p>
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex" />
+      </Helmet>
+      <div className="comments-container">
+        {loading ? (
+          <p>Завантаження...</p>
+        ) : post ? (
+          <span className="comments-post-container">
+            <Post
+              key={post.id}
+              post={post}
+              username={username}
+              disableNavigation={true}
+              hideMenu={true}
+            />
+          </span>
         ) : (
-          <ul>
-            {comments.map((comment) => (
-              <li key={comment.id} className="comment-item">
-                <div className="comment-item-header">
-                  <div className="comment-item-header-left">
-                    {comment.avatar ? (
-                      <img src={comment.avatar} alt="Аватар" />
-                    ) : (
-                      <img src={"/media/avatars/avatar.jpg"} />
-                    )}
-                    <strong>{comment.author}</strong>
-                    {postOwner === comment.author && (
-                      <>
-                        <span>•</span>
-                        <strong className="author">Автор</strong>
-                      </>
+          <p>Допис не знайдено або видалено.</p>
+        )}
+        <div className="comment-form">
+          <textarea
+            value={newComment}
+            onChange={handleCommentChange}
+            placeholder="Введіть текст..."
+            rows="3"
+          ></textarea>
+          <button onClick={handleCommentSubmit} disabled={loading}>
+            {loading ? "Завантаження..." : "Додати коментар"}
+          </button>
+        </div>
+        <div className="post-comments">
+          <h4>Коментарі ({comments.length})</h4>
+          {loading && <p>Завантаження коментарів...</p>}
+          {error && <p>{error}</p>}
+          {!loading && comments.length === 0 ? (
+            <p>Немає коментарів.</p>
+          ) : (
+            <ul>
+              {comments.map((comment) => (
+                <li key={comment.id} className="comment-item">
+                  <div className="comment-item-header">
+                    <div className="comment-item-header-left">
+                      {comment.avatar ? (
+                        <img src={comment.avatar} alt="Аватар" />
+                      ) : (
+                        <img src={"/media/avatars/avatar.jpg"} />
+                      )}
+                      <strong>{comment.author}</strong>
+                      {postOwner === comment.author && (
+                        <>
+                          <span>•</span>
+                          <strong className="author">Автор</strong>
+                        </>
+                      )}
+                    </div>
+                    {(currentUser === comment.author ||
+                      currentUser === postOwner) && (
+                      <span
+                        onClick={() => handleCommentDelete(comment.id)}
+                        className="fa-trash"
+                      >
+                        <FaTrash />
+                      </span>
                     )}
                   </div>
-                  {(currentUser === comment.author ||
-                    currentUser === postOwner) && (
-                    <span
-                      onClick={() => handleCommentDelete(comment.id)}
-                      className="fa-trash"
-                    >
-                      <FaTrash />
-                    </span>
-                  )}
-                </div>
-                <p>{comment.text}</p>
-                <small>
-                  {new Date(comment.created_at).toLocaleDateString()},{" "}
-                  {new Date(comment.created_at).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </small>
-              </li>
-            ))}
-          </ul>
-        )}
+                  <p>{comment.text}</p>
+                  <small>
+                    {new Date(comment.created_at).toLocaleDateString()},{" "}
+                    {new Date(comment.created_at).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </small>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

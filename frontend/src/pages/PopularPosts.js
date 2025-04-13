@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Helmet } from "react-helmet";
 import Post from "../components/Post";
 import API from "../API";
 
@@ -49,23 +50,28 @@ const PopularPosts = () => {
   if (error) return <p className="popular-error">{error}</p>;
 
   return (
-    <div className="popular-posts-page">
-      <h2>Популярні дописи</h2>
-      {posts.length > 0 ? (
-        <div className="popular-posts-section">
-          {posts.map((post) => (
-            <Post
-              key={post.id}
-              post={post}
-              username={post.author}
-              disableNavigation={false}
-            />
-          ))}
-        </div>
-      ) : (
-        <p className="popular-no-results">Немає популярних дописів.</p>
-      )}
-    </div>
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex" />
+      </Helmet>
+      <div className="popular-posts-page">
+        <h2>Популярні дописи</h2>
+        {posts.length > 0 ? (
+          <div className="popular-posts-section">
+            {posts.map((post) => (
+              <Post
+                key={post.id}
+                post={post}
+                username={post.author}
+                disableNavigation={false}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="popular-no-results">Немає популярних дописів.</p>
+        )}
+      </div>
+    </>
   );
 };
 

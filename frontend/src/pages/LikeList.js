@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Helmet } from "react-helmet";
 import { useParams, useNavigate } from "react-router-dom";
 import API from "../API";
 
@@ -30,37 +31,42 @@ const LikeList = () => {
   if (error) return <p className="error">{error}</p>;
 
   return (
-    <div className="like-list-page">
-      {likes.length === 0 ? (
-        <p>Ще ніхто не лайкнув цей допис.</p>
-      ) : (
-        <>
-          <h2>Кому сподобалось</h2>
-          <ul className="like-list">
-            {likes.map((like) => (
-              <li
-                key={like.user_id}
-                className="like-item"
-                onClick={() => navigate(`/profile/${like.username}/`)}
-              >
-                <div className="user-info">
-                  <img
-                    src={
-                      like.avatar_url
-                        ? like.avatar_url
-                        : "/media/avatars/avatar.jpg"
-                    }
-                    alt="Аватар"
-                    className="like-avatar"
-                  />
-                  <span>{like.username}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-    </div>
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex" />
+      </Helmet>
+      <div className="like-list-page">
+        {likes.length === 0 ? (
+          <p>Ще ніхто не лайкнув цей допис.</p>
+        ) : (
+          <>
+            <h2>Кому сподобалось</h2>
+            <ul className="like-list">
+              {likes.map((like) => (
+                <li
+                  key={like.user_id}
+                  className="like-item"
+                  onClick={() => navigate(`/profile/${like.username}/`)}
+                >
+                  <div className="user-info">
+                    <img
+                      src={
+                        like.avatar_url
+                          ? like.avatar_url
+                          : "/media/avatars/avatar.jpg"
+                      }
+                      alt="Аватар"
+                      className="like-avatar"
+                    />
+                    <span>{like.username}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </div>
+    </>
   );
 };
 

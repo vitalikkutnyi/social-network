@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Helmet } from "react-helmet";
 import { useParams, useNavigate } from "react-router-dom";
 import { TbPointFilled } from "react-icons/tb";
 import { FaPaperPlane } from "react-icons/fa";
@@ -124,83 +125,88 @@ const ChatMessages = () => {
   if (error) return <p>{error}</p>;
 
   return (
-    <div className="chat-messages-container">
-      <PageTitle chatUsername={otherUser.username} />
-      <div className="chat-header">
-        <div className="user-info">
-          {otherUser.avatar_url ? (
-            <img
-              src={`${otherUser.avatar_url}`}
-              alt={otherUser.username}
-              className="chat-avatar"
-            />
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex" />
+      </Helmet>
+      <div className="chat-messages-container">
+        <PageTitle chatUsername={otherUser.username} />
+        <div className="chat-header">
+          <div className="user-info">
+            {otherUser.avatar_url ? (
+              <img
+                src={`${otherUser.avatar_url}`}
+                alt={otherUser.username}
+                className="chat-avatar"
+              />
+            ) : (
+              <img
+                src="/media/avatars/avatar.jpg"
+                alt="Аватар за замовчуванням"
+                className="chat-avatar"
+              />
+            )}
+            <h2>{otherUser.username}</h2>
+          </div>
+        </div>
+        <div className="messages-list">
+          {messages.length === 0 ? (
+            <p className="no-message">Немає повідомлень у цьому чаті.</p>
           ) : (
-            <img
-              src="/media/avatars/avatar.jpg"
-              alt="Аватар за замовчуванням"
-              className="chat-avatar"
-            />
-          )}
-          <h2>{otherUser.username}</h2>
-        </div>
-      </div>
-      <div className="messages-list">
-        {messages.length === 0 ? (
-          <p className="no-message">Немає повідомлень у цьому чаті.</p>
-        ) : (
-          messages.map((message) => (
-            <div
-              key={message.message_id}
-              className={`message ${
-                message.sender_name === currentUser ? "sent" : "received"
-              }`}
-            >
-              {message.sender_avatar_url ? (
-                <img
-                  src={`${message.sender_avatar_url}`}
-                  alt="Аватар"
-                  className="message-avatar"
-                />
-              ) : (
-                <img
-                  src="/media/avatars/avatar.jpg"
-                  alt="Аватар за замовчуванням"
-                  className="message-avatar"
-                />
-              )}
-              <div className="message-content">
-                <p>{message.text}</p>
-                <small>
-                  {new Intl.DateTimeFormat("uk-UA", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }).format(new Date(message.sent_at))}{" "}
-                </small>
+            messages.map((message) => (
+              <div
+                key={message.message_id}
+                className={`message ${
+                  message.sender_name === currentUser ? "sent" : "received"
+                }`}
+              >
+                {message.sender_avatar_url ? (
+                  <img
+                    src={`${message.sender_avatar_url}`}
+                    alt="Аватар"
+                    className="message-avatar"
+                  />
+                ) : (
+                  <img
+                    src="/media/avatars/avatar.jpg"
+                    alt="Аватар за замовчуванням"
+                    className="message-avatar"
+                  />
+                )}
+                <div className="message-content">
+                  <p>{message.text}</p>
+                  <small>
+                    {new Intl.DateTimeFormat("uk-UA", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }).format(new Date(message.sent_at))}{" "}
+                  </small>
+                </div>
+                {message.sender_name === currentUser && (
+                  <span className="message-status">
+                    {message.is_read ? "" : <TbPointFilled />}
+                  </span>
+                )}
               </div>
-              {message.sender_name === currentUser && (
-                <span className="message-status">
-                  {message.is_read ? "" : <TbPointFilled />}
-                </span>
-              )}
-            </div>
-          ))
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-      <form onSubmit={handleSendMessage} className="message-form">
-        <div className="input-wrapper">
-          <textarea
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Введіть повідомлення..."
-            className="message-input"
-          />
-          <button type="submit" className="send-message-button">
-            <FaPaperPlane />
-          </button>
+            ))
+          )}
+          <div ref={messagesEndRef} />
         </div>
-      </form>
-    </div>
+        <form onSubmit={handleSendMessage} className="message-form">
+          <div className="input-wrapper">
+            <textarea
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Введіть повідомлення..."
+              className="message-input"
+            />
+            <button type="submit" className="send-message-button">
+              <FaPaperPlane />
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
   );
 };
 

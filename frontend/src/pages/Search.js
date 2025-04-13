@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Helmet } from "react-helmet";
 import { useNavigate, useLocation } from "react-router-dom";
 import Post from "../components/Post";
 import API from "../API";
@@ -78,80 +79,85 @@ const Search = () => {
   };
 
   return (
-    <div className="search-container">
-      <div className="search">
-        <input
-          type="text"
-          value={query}
-          onChange={handleInputChange}
-          placeholder="Пошук"
-          className="search-input"
-        />
-        <button
-          onClick={handleSearchClick}
-          disabled={loading}
-          className="search-button"
-        >
-          {loading ? "Пошук..." : "Пошук"}
-        </button>
-      </div>
-      {loading && <p className="search-loading">Завантаження...</p>}
-      {error && <p className="search-error">{error}</p>}
-      {!loading &&
-        !error &&
-        query &&
-        users.length === 0 &&
-        posts.length === 0 && (
-          <p className="search-no-results">Нічого не знайдено.</p>
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex" />
+      </Helmet>
+      <div className="search-container">
+        <div className="search">
+          <input
+            type="text"
+            value={query}
+            onChange={handleInputChange}
+            placeholder="Пошук"
+            className="search-input"
+          />
+          <button
+            onClick={handleSearchClick}
+            disabled={loading}
+            className="search-button"
+          >
+            {loading ? "Пошук..." : "Пошук"}
+          </button>
+        </div>
+        {loading && <p className="search-loading">Завантаження...</p>}
+        {error && <p className="search-error">{error}</p>}
+        {!loading &&
+          !error &&
+          query &&
+          users.length === 0 &&
+          posts.length === 0 && (
+            <p className="search-no-results">Нічого не знайдено.</p>
+          )}
+
+        {users.length > 0 && (
+          <div className="search-section">
+            <h3>Користувачі</h3>
+
+            <ul className="search-results">
+              {users.map((user) => (
+                <li
+                  key={user.id}
+                  className="search-result-item"
+                  onClick={() => handleUserClick(user.username)}
+                >
+                  {user.avatar_url ? (
+                    <img
+                      src={`${user.avatar_url}`}
+                      alt="Аватар"
+                      className="search-avatar"
+                    />
+                  ) : (
+                    <img
+                      src={"/media/avatars/avatar.jpg"}
+                      alt="Аватар за замовчуванням"
+                      className="search-avatar"
+                    />
+                  )}
+                  <span>{user.username}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
 
-      {users.length > 0 && (
-        <div className="search-section">
-          <h3>Користувачі</h3>
-
-          <ul className="search-results">
-            {users.map((user) => (
-              <li
-                key={user.id}
-                className="search-result-item"
-                onClick={() => handleUserClick(user.username)}
-              >
-                {user.avatar_url ? (
-                  <img
-                    src={`${user.avatar_url}`}
-                    alt="Аватар"
-                    className="search-avatar"
-                  />
-                ) : (
-                  <img
-                    src={"/media/avatars/avatar.jpg"}
-                    alt="Аватар за замовчуванням"
-                    className="search-avatar"
-                  />
-                )}
-                <span>{user.username}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {posts.length > 0 && (
-        <div className="search-section">
-          <h3>Дописи</h3>
-          <div className="search-posts">
-            {posts.map((post) => (
-              <Post
-                key={post.id}
-                post={post}
-                username={post.author}
-                disableNavigation={false}
-              />
-            ))}
+        {posts.length > 0 && (
+          <div className="search-section">
+            <h3>Дописи</h3>
+            <div className="search-posts">
+              {posts.map((post) => (
+                <Post
+                  key={post.id}
+                  post={post}
+                  username={post.author}
+                  disableNavigation={false}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 };
 
