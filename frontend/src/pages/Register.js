@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import AuthForm from "../components/AuthForm";
 import API from "../API";
@@ -59,66 +58,30 @@ function Register() {
   };
 
   return (
-    <>
-      <Helmet>
-        <meta name="robots" content="index, follow" />
-        <meta
-          name="description"
-          content="Зареєструйтеся в соціальній мережі Lynquora, щоби спілкуватися, ділитися публікаціями та знаходити нових друзів."
-        />
-        <meta
-          name="keywords"
-          content="реєстрація, створення акаунта, соціальна мережа, Lynquora, спілкування, друзі"
-        />
-        <meta property="og:title" content="Реєстрація / Lynquora" />
-        <meta
-          property="og:description"
-          content="Зареєструйтеся в соціальній мережі Lynquora, щоби спілкуватися, ділитися публікаціями та знаходити нових друзів."
-        />
-        <meta
-          property="og:image"
-          content="https://lynquora.me/favicon.ico?v=3"
-        />
-        <meta property="og:url" content="https://lynquora.me/register/" />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Реєстрація / Lynquora" />
-        <meta
-          name="twitter:description"
-          content="Зареєструйтеся в соціальній мережі Lynquora, щоби спілкуватися, ділитися публікаціями та знаходити нових друзів."
-        />
-        <meta
-          name="twitter:image"
-          content="https://lynquora.me/favicon.ico?v=3"
-        />
-        <link rel="canonical" href="https://lynquora.me/register/" />
-        <title>Реєстрація | Lynquora</title>
-      </Helmet>
-      <AuthForm
-        title="Реєстрація"
-        onSubmit={handleSubmit}
-        username={username}
-        setUsername={setUsername}
-        password={password}
-        setPassword={setPassword}
-        password2={password2}
-        setPassword2={setPassword2}
-        qrCode={qrCode}
-        setQrCode={setQrCode}
-        error={error}
-        message={message}
-        buttonText="Зареєструватися"
-        anotherContent={
-          <>
-            <p>Вже зареєстровані?</p>
-            <button type="button" onClick={() => navigate("/login/")}>
-              Увійти
-            </button>
-          </>
-        }
-        onContinue={handleContinue}
-      />
-    </>
+    <AuthForm
+      title="Реєстрація"
+      onSubmit={handleSubmit}
+      username={username}
+      setUsername={setUsername}
+      password={password}
+      setPassword={setPassword}
+      password2={password2}
+      setPassword2={setPassword2}
+      qrCode={qrCode}
+      setQrCode={setQrCode}
+      error={error}
+      message={message}
+      buttonText="Зареєструватися"
+      anotherContent={
+        <>
+          <p>Вже зареєстровані?</p>
+          <button type="button" onClick={() => navigate("/login/")}>
+            Увійти
+          </button>
+        </>
+      }
+      onContinue={handleContinue}
+    />
   );
 }
 
